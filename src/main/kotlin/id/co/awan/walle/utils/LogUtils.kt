@@ -19,7 +19,8 @@ class LogUtils {
             clazz: Class<*>,
             methodName: String,
             request: JsonNode
-        ) {
+        ): String {
+
             val reqToken = generateLogToken()
             log.info(
                 "[HTTP-REQUEST {} - {}:{}] : {}",
@@ -28,6 +29,8 @@ class LogUtils {
                 "$methodName()",
                 request.toPrettyString()
             )
+
+            return "$reqToken|$methodName"
         }
 
         fun logHttpResponse(
