@@ -49,7 +49,7 @@ abstract class CoinGeckoCoreAbstract(
         body: JsonNode? = null,
     ): ResponseEntity<JsonNode?> {
 
-        val uri = UriComponentsBuilder.fromUriString(coinGeckoHost + coinGeckoPath)
+        val url = UriComponentsBuilder.fromUriString(coinGeckoHost + coinGeckoPath)
             .queryParams(queryParams)
             .build()
             .toUri()
@@ -59,7 +59,7 @@ abstract class CoinGeckoCoreAbstract(
         headers["x-cg-demo-api-key"] = apiKey
 
         return restTemplate.exchange(
-            uri,
+            url,
             method,
             HttpEntity<JsonNode?>(body, headers),
             JsonNode::class.java

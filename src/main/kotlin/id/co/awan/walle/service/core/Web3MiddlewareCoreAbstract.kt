@@ -53,7 +53,7 @@ abstract class Web3MiddlewareCoreAbstract(
         body: JsonNode? = null,
     ): ResponseEntity<JsonNode?> {
 
-        val uri = UriComponentsBuilder.fromUriString(web3MiddlewareHost + erc20MiddlewarePath)
+        val url = UriComponentsBuilder.fromUriString(web3MiddlewareHost + erc20MiddlewarePath)
             .queryParams(queryParams)
             .build()
             .toUri()
@@ -64,7 +64,7 @@ abstract class Web3MiddlewareCoreAbstract(
         headers.setBasicAuth(web3MiddlewareUsername, web3MiddlewarePassword, StandardCharsets.UTF_8)
 
         return restTemplate.exchange(
-            web3MiddlewareHost + erc20MiddlewarePath,
+            url,
             method,
             HttpEntity<JsonNode?>(body, headers),
             JsonNode::class.java
