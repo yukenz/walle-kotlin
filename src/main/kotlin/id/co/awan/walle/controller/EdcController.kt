@@ -100,6 +100,7 @@ class EdcController(
         val ethSignMessage = request.at("/ethSignMessage").asText(null)
         val ownerAddress = request.at("/ownerAddress").asText(null)
         val cardAddress = request.at("/cardAddress").asText(null)
+        val chain = request.at("/chain").asText(null)
 
         // Validate Signature
         val message = String.format(
@@ -131,7 +132,7 @@ class EdcController(
         hsmService.getHsm(hashCard, hashPin, ownerAddress)
 
         // Try to recover card gas availability
-        ethMiddlewareService.recoverCardGasAvailability(cardAddress)
+        ethMiddlewareService.recoverCardGasAvailability(chain, cardAddress)
         return ResponseEntity.ok(null)
     }
 

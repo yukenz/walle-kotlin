@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController
 
 
 @RestController
-@RequestMapping("/api/v1/cards")
+@RequestMapping("/api/v1/card")
 class CardController(
     val tap2PayService: Tap2PayService,
     val eip712MiddlewareService: Eip712MiddlewareService,
