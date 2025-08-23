@@ -45,11 +45,11 @@ class CardController(
 
     @Operation(summary = "RegisterCard")
     @PostMapping(
-        path = ["/card-register"],
+        path = ["/register"],
         consumes = [MediaType.APPLICATION_JSON_VALUE],
         produces = [MediaType.TEXT_PLAIN_VALUE]
     )
-    fun cardRegistration(
+    fun registerCard(
         @RequestBody request: JsonNode
     ): ResponseEntity<Any?> {
 
@@ -82,7 +82,7 @@ class CardController(
         consumes = [MediaType.APPLICATION_JSON_VALUE],
         produces = [MediaType.TEXT_PLAIN_VALUE]
     )
-    fun cardAccess(
+    fun accessCard(
         @RequestBody request: JsonNode
     ): ResponseEntity<String?> {
 
@@ -115,7 +115,7 @@ class CardController(
         consumes = [MediaType.APPLICATION_JSON_VALUE],
         produces = [MediaType.TEXT_PLAIN_VALUE]
     )
-    fun cardChangePin(
+    fun changePin(
         @RequestBody request: JsonNode
     ): ResponseEntity<Any?> {
 

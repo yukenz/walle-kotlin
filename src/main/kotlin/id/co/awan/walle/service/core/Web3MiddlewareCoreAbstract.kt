@@ -81,8 +81,8 @@ abstract class Web3MiddlewareCoreAbstract(
             )
 
         if (responseEntity.statusCode != HttpStatus.OK) {
-            val error = responseJson.at("/error").asText("General Error")
-            val errorDetail = responseJson.at("/errorDetail").asText(null)
+            val error = responseJson.at("/errorCode").asText("01")
+            val errorDetail = responseJson.at("/errorDetail").toPrettyString()
             throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "$error|$errorDetail")
         }
 
