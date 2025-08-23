@@ -20,9 +20,6 @@ class HSMService(
         ownerAddress: String
     ) {
         val hsm: Hsm = getHsm(hashCard, hashPin, ownerAddress)
-            ?: throw ResponseStatusException(
-                HttpStatus.NOT_FOUND, "01|HSM not found"
-            )
         hsm.pin = newHashPin
 
         hsmRepository.save(hsm)
@@ -33,22 +30,26 @@ class HSMService(
         hashCard: String,
         hashPin: String,
         ownerAddress: String
-    ): Hsm? {
+    ): Hsm {
+
         return hsmRepository.findByIdAndPinAndOwnerAddress(
-            hashCard,
-            hashPin,
+            id = hashCard,
+            pin = hashPin,
             ownerAddress
+        ) ?: throw ResponseStatusException(
+            HttpStatus.NOT_FOUND, "HSM Not Found"
         )
     }
 
     fun getHsm(
         hashCard: String,
         hashPin: String
-    ): Hsm? {
-        return hsmRepository.findByIdAndPin(
-            hashCard,
-            hashPin
-        )
+    ): Hsm {
+
+        return hsmRepository.findByIdAndPin(hashCard, hashPin)
+            ?: throw ResponseStatusException(
+                HttpStatus.NOT_FOUND, "HSM Not Found"
+            )
     }
 
 

@@ -12,10 +12,9 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.server.ResponseStatusException
 
 @Service
-class EIP712MiddlewareService(restTemplate: RestTemplate) : Web3MiddlewareCoreAbstract(restTemplate) {
+class Eip712MiddlewareService(restTemplate: RestTemplate) : Web3MiddlewareCoreAbstract(restTemplate) {
 
-    @Throws(Exception::class)
-    private fun getSignerCardSelfService(
+    fun getSignerCardSelfService(
         operation: CardSelfServiceOperation,
         hashCard: String,
         hashPin: String,
@@ -41,5 +40,26 @@ class EIP712MiddlewareService(restTemplate: RestTemplate) : Web3MiddlewareCoreAb
 
         return data
     }
+
+
+    fun validateSignerCardSelfService(
+        operation: CardSelfServiceOperation,
+        hashCard: String,
+        hashPin: String,
+        signature: String,
+        signerAddress: String
+    ): String {
+
+        val recoveredAddress = getSignerCardSelfService(operation, hashCard, hashPin, signature)
+
+        if (recoveredAddress == signerAddress) {
+            throw ResponseStatusException(
+                HttpStatus.UNAUTHORIZED, "Signer Validation Failed"
+            )
+        }
+
+        return recoveredAddress
+    }
+
 
 }
