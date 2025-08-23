@@ -111,7 +111,8 @@ abstract class MidtransCoreAbstract(
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
         headers.accept = mutableListOf(MediaType.APPLICATION_JSON)
-        headers.setBasicAuth(serverKey, "", StandardCharsets.UTF_8)
+//        headers.setBasicAuth(serverKey, "", StandardCharsets.UTF_8)
+        headers.setBasicAuth("Administrator", "manage", StandardCharsets.UTF_8)
 
         return restTemplate.exchange(
             url,
@@ -128,7 +129,7 @@ abstract class MidtransCoreAbstract(
                 HttpStatus.INTERNAL_SERVER_ERROR, "01|ResponseJson should not be null"
             )
 
-        if (responseEntity.statusCode != HttpStatus.OK) {
+        if ((responseEntity.statusCode != HttpStatus.OK) && (responseEntity.statusCode != HttpStatus.CREATED)) {
             throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "01" + "|" + responseEntity.statusCode)
         }
 

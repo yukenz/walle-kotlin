@@ -60,7 +60,7 @@ class MidtransNotificationService(
         val statusCode = request.at("/status_code").asText()
         val grossAmount = request.at("/gross_amount").asText()
 
-        val digest = MessageDigest.getInstance("SHA-512", "BC")
+        val digest = MessageDigest.getInstance("SHA-512")
         val hashBytes = digest.digest(
             (orderId + statusCode + grossAmount + serverKey)
                 .toByteArray(StandardCharsets.UTF_8)

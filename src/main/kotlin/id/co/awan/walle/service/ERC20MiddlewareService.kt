@@ -130,19 +130,17 @@ class ERC20MiddlewareService(
         val responseJson = super.parseResponseJsonNode(responseEntity)
         LogUtils.logHttpResponse(reqToken, this.javaClass, responseJson)
 
-        val trxReceipt = responseJson.at("/trxReceipt").asText(null)
-            ?: throw ResponseStatusException(
-                HttpStatus.INTERNAL_SERVER_ERROR, "01|trxReceipt should not be null"
-            )
-
-        val estimateWei = responseJson.at("/estimateWei").asText(null)
-            ?: throw ResponseStatusException(
-                HttpStatus.INTERNAL_SERVER_ERROR, "01|estimateWei should not be null"
-            )
-
         return when (scOperation) {
-            ScOperation.SIMULATE -> estimateWei
-            ScOperation.WRITE -> trxReceipt
+            ScOperation.SIMULATE -> responseJson.at("/estimateWei").asText(null)
+                ?: throw ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, "01|estimateWei should not be null"
+                )
+
+            ScOperation.WRITE -> responseJson.at("/trxReceipt").asText(null)
+                ?: throw ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, "01|trxReceipt should not be null"
+                )
+
         }
     }
 

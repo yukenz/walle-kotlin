@@ -38,8 +38,9 @@ class MidtransService(
 
         val logToken: String = LogUtils.logHttpRequest(this.javaClass, "createTransaction", request)
         val responseEntity: ResponseEntity<JsonNode?> = post(transactionPath, null, request)
-        val response: JsonNode = super.parseResponseJsonNode(responseEntity)
-        LogUtils.logHttpResponse(logToken, this.javaClass, response)
+        responseEntity.body?.also {
+            LogUtils.logHttpResponse(logToken, this.javaClass, it)
+        }
 
         /*
         {
@@ -47,6 +48,8 @@ class MidtransService(
             "redirect_url": "https://app.sandbox.midtrans.com/snap/v3/redirection/{{snap_token}}"
         }
         */
+
+        @Suppress("UNCHECKED_CAST") // Has checked in super.parseResponseJsonNode
         return responseEntity
     }
 
