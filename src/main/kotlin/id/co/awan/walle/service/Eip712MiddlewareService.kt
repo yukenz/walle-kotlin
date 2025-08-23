@@ -20,12 +20,13 @@ class Eip712MiddlewareService(restTemplate: RestTemplate) : Web3MiddlewareCoreAb
         signature: String
     ): String {
 
-        val request = JsonNodeFactory.instance.objectNode()
-        request.put("chain", chain)
-        request.put("operation", operation.ordinal)
-        request.put("hashCard", hashCard)
-        request.put("hashPin", hashPin)
-        request.put("signature", signature)
+        val request = JsonNodeFactory.instance.objectNode().apply {
+            put("chain", chain)
+            put("operation", operation.ordinal)
+            put("hashCard", hashCard)
+            put("hashPin", hashPin)
+            put("signature", signature)
+        }
 
         val reqToken = LogUtils.logHttpRequest(this.javaClass, "getSignerCardSelfService", request)
         val responseEntity = super.post("/api/web3/eip712/walle/signerCardSelfService", null, request)

@@ -34,9 +34,10 @@ class ERC20MiddlewareService(restTemplate: RestTemplate) : Web3MiddlewareCoreAbs
         erc20Address: String
     ): BigInteger {
 
-        val request = JsonNodeFactory.instance.objectNode()
-        request.put("chain", chain)
-        request.put("erc20Address", erc20Address)
+        val request = JsonNodeFactory.instance.objectNode().apply {
+            put("chain", chain)
+            put("erc20Address", erc20Address)
+        }
 
         val reqToken = LogUtils.logHttpRequest(this.javaClass, "totalSupply", request)
         val responseEntity: ResponseEntity<JsonNode?> = super.post("/api/web3/erc20/read/totalSupply", null, request)
@@ -58,11 +59,12 @@ class ERC20MiddlewareService(restTemplate: RestTemplate) : Web3MiddlewareCoreAbs
         destinationAddress: String
     ): BigInteger {
 
-        val request = JsonNodeFactory.instance.objectNode()
-        request.put("chain", chain)
-        request.put("erc20Address", erc20Address)
-        request.put("sourceAddress", sourceAddress)
-        request.put("destinationAddress", destinationAddress)
+        val request = JsonNodeFactory.instance.objectNode().apply {
+            put("chain", chain)
+            put("erc20Address", erc20Address)
+            put("sourceAddress", sourceAddress)
+            put("destinationAddress", destinationAddress)
+        }
 
         val reqToken: String = LogUtils.logHttpRequest(this.javaClass, "allowance", request)
         val responseEntity: ResponseEntity<JsonNode?> = post("/api/web3/erc20/read/allowance", null, request)
@@ -108,12 +110,13 @@ class ERC20MiddlewareService(restTemplate: RestTemplate) : Web3MiddlewareCoreAbs
         scOperation: ScOperation
     ): String {
 
-        val request = JsonNodeFactory.instance.objectNode()
-        request.put("chain", chain)
-        request.put("privateKey", privateKey)
-        request.put("erc20Address", erc20Address)
-        request.put("destinationAddress", destinationAddress)
-        request.put("amount", amount)
+        val request = JsonNodeFactory.instance.objectNode().apply {
+            put("chain", chain)
+            put("privateKey", privateKey)
+            put("erc20Address", erc20Address)
+            put("destinationAddress", destinationAddress)
+            put("amount", amount)
+        }
 
         val urlPath = when (scOperation) {
             ScOperation.SIMULATE -> "/api/web3/erc20/simulate/transfer"
@@ -151,13 +154,14 @@ class ERC20MiddlewareService(restTemplate: RestTemplate) : Web3MiddlewareCoreAbs
         scOperation: ScOperation
     ): String {
 
-        val request = JsonNodeFactory.instance.objectNode()
-        request.put("chain", chain)
-        request.put("privateKey", privateKey)
-        request.put("erc20Address", erc20Address)
-        request.put("sourceAddress", sourceAddress)
-        request.put("destinationAddress", destinationAddress)
-        request.put("amount", amount)
+        val request = JsonNodeFactory.instance.objectNode().apply {
+            put("chain", chain)
+            put("privateKey", privateKey)
+            put("erc20Address", erc20Address)
+            put("sourceAddress", sourceAddress)
+            put("destinationAddress", destinationAddress)
+            put("amount", amount)
+        }
 
         val urlPath = when (scOperation) {
             ScOperation.SIMULATE -> "/api/web3/erc20/simulate/transferFrom"
@@ -194,12 +198,13 @@ class ERC20MiddlewareService(restTemplate: RestTemplate) : Web3MiddlewareCoreAbs
         scOperation: ScOperation
     ): String {
 
-        val request = JsonNodeFactory.instance.objectNode()
-        request.put("chain", chain)
-        request.put("privateKey", privateKey)
-        request.put("erc20Address", erc20Address)
-        request.put("destinationAddress", destinationAddress)
-        request.put("amount", amount)
+        val request = JsonNodeFactory.instance.objectNode().apply {
+            put("chain", chain)
+            put("privateKey", privateKey)
+            put("erc20Address", erc20Address)
+            put("destinationAddress", destinationAddress)
+            put("amount", amount)
+        }
 
         val urlPath = when (scOperation) {
             ScOperation.SIMULATE -> "/api/web3/erc20/simulate/approve"

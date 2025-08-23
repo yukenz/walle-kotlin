@@ -48,24 +48,27 @@ abstract class MidtransCoreAbstract(
                   }
                   */
 
-        val transactionDetails = JsonNodeFactory.instance.objectNode()
-        transactionDetails.put("order_id", orderId)
-        transactionDetails.put("gross_amount", grossAmount)
+        val transactionDetails = JsonNodeFactory.instance.objectNode().apply {
+            put("order_id", orderId)
+            put("gross_amount", grossAmount)
+        }
 
-        val creditCard = JsonNodeFactory.instance.objectNode()
-        creditCard.put("secure", secure)
+        val creditCard = JsonNodeFactory.instance.objectNode().apply {
+            put("secure", secure)
+        }
 
-        val customerDetails = JsonNodeFactory.instance.objectNode()
-        customerDetails.put("first_name", firstName)
-        customerDetails.put("last_name", lastName)
-        customerDetails.put("email", email)
-        customerDetails.put("phone", phone)
+        val customerDetails = JsonNodeFactory.instance.objectNode().apply {
+            put("first_name", firstName)
+            put("last_name", lastName)
+            put("email", email)
+            put("phone", phone)
+        }
 
-        val requestObject = JsonNodeFactory.instance.objectNode()
-        requestObject.set<JsonNode>("transaction_details", transactionDetails)
-        requestObject.set<JsonNode>("credit_card", creditCard)
-        requestObject.set<JsonNode>("customer_details", customerDetails)
-
+        val requestObject = JsonNodeFactory.instance.objectNode().apply {
+            set<JsonNode>("transaction_details", transactionDetails)
+            set<JsonNode>("credit_card", creditCard)
+            set<JsonNode>("customer_details", customerDetails)
+        }
         return requestObject
     }
 

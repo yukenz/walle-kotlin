@@ -43,9 +43,10 @@ class EthMiddlewareService(
         signature: String
     ): String {
 
-        val request = JsonNodeFactory.instance.objectNode()
-        request.put("message", message)
-        request.put("signature", signature)
+        val request = JsonNodeFactory.instance.objectNode().apply {
+            put("message", message)
+            put("signature", signature)
+        }
 
         val reqToken = LogUtils.logHttpRequest(this.javaClass, "ecRecover", request)
         val responseEntity = super.post("/api/web3/eth/read/ecRecover", null, request)
@@ -71,9 +72,10 @@ class EthMiddlewareService(
         address: String,
     ): BigInteger {
 
-        val request = JsonNodeFactory.instance.objectNode()
-        request.put("chain", chain)
-        request.put("address", address)
+        val request = JsonNodeFactory.instance.objectNode().apply {
+            put("chain", chain)
+            put("address", address)
+        }
 
         val reqToken = LogUtils.logHttpRequest(this.javaClass, "balanceOf", request)
         val responseEntity = super.post("/api/web3/eth/read/balanceOf", null, request)
@@ -120,12 +122,13 @@ class EthMiddlewareService(
         unit: String
     ): String {
 
-        val request = JsonNodeFactory.instance.objectNode()
-        request.put("chain", chain)
-        request.put("privateKey", super.web3MasterPrivateKey)
-        request.put("toAddress", toAddress)
-        request.put("amount", amount.toString())
-        request.put("unit", unit)
+        val request = JsonNodeFactory.instance.objectNode().apply {
+            put("chain", chain)
+            put("privateKey", super.web3MasterPrivateKey)
+            put("toAddress", toAddress)
+            put("amount", amount.toString())
+            put("unit", unit)
+        }
 
         val reqToken = LogUtils.logHttpRequest(this.javaClass, "gasFeeEIP1559", request)
         val responseEntity = super.post("/api/web3/eth/simulate/transferEIP1559", null, request)
@@ -187,12 +190,13 @@ class EthMiddlewareService(
         unit: String
     ): String {
 
-        val request = JsonNodeFactory.instance.objectNode()
-        request.put("chain", chain)
-        request.put("privateKey", super.web3MasterPrivateKey)
-        request.put("toAddress", toAddress)
-        request.put("amount", amount.toString())
-        request.put("unit", unit)
+        val request = JsonNodeFactory.instance.objectNode().apply {
+            put("chain", chain)
+            put("privateKey", super.web3MasterPrivateKey)
+            put("toAddress", toAddress)
+            put("amount", amount.toString())
+            put("unit", unit)
+        }
 
         val reqToken = LogUtils.logHttpRequest(this.javaClass, "transferEIP1559", request)
         val responseEntity = super.post("/api/web3/eth/write/transferEIP1559", null, request)
