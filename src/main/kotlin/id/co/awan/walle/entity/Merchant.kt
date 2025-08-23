@@ -17,7 +17,7 @@ class Merchant {
     lateinit var key: String
 
     // TODO: Make sure this not error
-    @OneToMany(mappedBy = "terminal")
+    @OneToMany(mappedBy = "merchant")
     var terminals: Set<Terminal> = emptySet()
 
     @Column(name = "address", nullable = false, length = Integer.MAX_VALUE)
