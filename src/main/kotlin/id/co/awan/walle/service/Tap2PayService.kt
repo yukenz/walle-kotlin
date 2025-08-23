@@ -83,7 +83,7 @@ class Tap2PayService(
     }
 
     fun getCards(ownerAddress: String): MutableList<String> {
-        return hsmRepository.findAllByOwnerAddress(ownerAddress)
+        return hsmRepository.findAllByOwnerAddress(ownerAddress.lowercase())
             .mapNotNull { it.id }   // Kotlin way - maps and filters nulls
             .toMutableList()        // Convert to MutableList)
     }
