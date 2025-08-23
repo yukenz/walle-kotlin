@@ -11,7 +11,7 @@ class LogUtils {
         private val log = LoggerFactory.getLogger(this::class.java)
         private val secureRandom = SecureRandom()
 
-        fun generateLogToken(): () -> String = {
+        val generateLogToken = {
             "REQ_${System.currentTimeMillis()}_${secureRandom.nextInt(999999)}"
         }
 
@@ -38,7 +38,7 @@ class LogUtils {
             clazz: Class<*>,
             response: JsonNode
         ) {
-            val reqTokenTupple = reqTokenJoin.split("\\|");
+            val reqTokenTupple = reqTokenJoin.split("|");
             log.info(
                 "[HTTP-RESPONSE {} - {}:{}] : {}",
                 reqTokenTupple[0],
