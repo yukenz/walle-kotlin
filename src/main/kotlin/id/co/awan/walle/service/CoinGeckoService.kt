@@ -12,7 +12,9 @@ import org.springframework.web.server.ResponseStatusException
 import java.math.BigDecimal
 
 @Service
-class CoinGeckoService(restTemplate: RestTemplate) : CoinGeckoCoreAbstract(restTemplate) {
+class CoinGeckoService(
+    private val restTemplate: RestTemplate
+) : CoinGeckoCoreAbstract(restTemplate) {
 
 
     fun ping(): JsonNode {

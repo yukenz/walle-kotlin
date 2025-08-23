@@ -10,7 +10,9 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.server.ResponseStatusException
 
 @Service
-class Eip712MiddlewareService(restTemplate: RestTemplate) : Web3MiddlewareCoreAbstract(restTemplate) {
+class Eip712MiddlewareService(
+    private val restTemplate: RestTemplate
+) : Web3MiddlewareCoreAbstract(restTemplate) {
 
     fun getSignerCardSelfService(
         chain: String,

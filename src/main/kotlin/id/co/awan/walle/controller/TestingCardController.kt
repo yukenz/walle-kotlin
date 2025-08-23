@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/testing/card")
 class TestingCardController(
-    val hsmService: HSMService,
+    private val hsmService: HSMService,
 ) {
 
     @Operation(summary = "Access Card")

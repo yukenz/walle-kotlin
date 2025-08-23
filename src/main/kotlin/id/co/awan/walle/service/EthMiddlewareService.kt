@@ -12,7 +12,7 @@ import java.math.BigInteger
 
 @Service
 class EthMiddlewareService(
-    restTemplate: RestTemplate
+    private val restTemplate: RestTemplate
 ) : Web3MiddlewareCoreAbstract(restTemplate) {
 
     companion object {

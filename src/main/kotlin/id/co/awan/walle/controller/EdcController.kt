@@ -2,6 +2,7 @@ package id.co.awan.walle.controller
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.JsonNodeFactory
+import id.co.awan.walle.service.ERC20MiddlewareService
 import id.co.awan.walle.service.EthMiddlewareService
 import id.co.awan.walle.service.HSMService
 import id.co.awan.walle.service.Tap2PayService
@@ -23,9 +24,10 @@ import kotlin.arrayOf
 @RestController
 @RequestMapping("/api/v1/edc")
 class EdcController(
-    val tap2PayService: Tap2PayService,
-    val hsmService: HSMService,
-    val ethMiddlewareService: EthMiddlewareService
+    private val tap2PayService: Tap2PayService,
+    private val hsmService: HSMService,
+    private val ethMiddlewareService: EthMiddlewareService,
+    private val eRC20MiddlewareService: ERC20MiddlewareService
 ) {
 
     @Operation(summary = "Inquiry Merchant")
@@ -93,6 +95,8 @@ class EdcController(
             merchantId,
             merchantKey
         )
+
+        eRC20MiddlewareService
 
         // Find HSM
         val hsm = hsmService.getHsm(hashCard, hashPin)

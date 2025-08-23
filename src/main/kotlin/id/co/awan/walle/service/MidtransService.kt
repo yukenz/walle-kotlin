@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 
 @Service
-class MidtransService(restTemplate: RestTemplate) : MidtransCoreAbstract(restTemplate) {
+class MidtransService(
+    private val restTemplate: RestTemplate
+) : MidtransCoreAbstract(restTemplate) {
 
     @Value("\${midtrans.path.transaction}")
     private lateinit var transactionPath: String

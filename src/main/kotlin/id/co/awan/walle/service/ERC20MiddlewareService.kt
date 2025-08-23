@@ -13,7 +13,9 @@ import org.springframework.web.server.ResponseStatusException
 import java.math.BigInteger
 
 @Service
-class ERC20MiddlewareService(restTemplate: RestTemplate) : Web3MiddlewareCoreAbstract(restTemplate) {
+class ERC20MiddlewareService(
+    private val restTemplate: RestTemplate
+) : Web3MiddlewareCoreAbstract(restTemplate) {
 
     enum class ScOperation {
         SIMULATE,
