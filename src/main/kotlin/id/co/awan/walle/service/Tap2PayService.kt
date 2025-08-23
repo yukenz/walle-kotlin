@@ -30,13 +30,13 @@ class Tap2PayService(
                 HttpStatus.NOT_FOUND, "01|Terminal not linked to merchant"
             )
 
-        if (merchantId == merchant.id) {
+        if (!merchantId.equals(merchant.id, ignoreCase = false)) {
             throw ResponseStatusException(
                 HttpStatus.UNAUTHORIZED, "Merchant ID for this Terminal isn't valid"
             )
         }
 
-        if (merchantKey == merchant.key) {
+        if (!merchantKey.equals(merchant.key, ignoreCase = false)) {
             throw ResponseStatusException(
                 HttpStatus.UNAUTHORIZED, "Key for merchant ID isn't valid"
             )

@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException
 import java.lang.String
 import java.security.SignatureException
 import kotlin.Throws
+import kotlin.apply
 import kotlin.arrayOf
 
 @RestController
@@ -26,6 +27,41 @@ class EdcController(
     val hsmService: HSMService,
     val ethMiddlewareService: EthMiddlewareService
 ) {
+
+    @Operation(summary = "Inquiry Merchant")
+    @PostMapping(
+        path = ["/merchant-inquiry"],
+        consumes = [MediaType.APPLICATION_JSON_VALUE],
+        produces = [MediaType.APPLICATION_JSON_VALUE]
+    )
+    fun merchantInquiry(
+        @RequestBody request: JsonNode
+    ): ResponseEntity<JsonNode?> {
+
+        val merchantId = request.at("/merchantId").asText(null)
+        val merchantKey = request.at("/merchantKey").asText(null)
+        val terminalId = request.at("/terminalId").asText(null)
+        val terminalKey = request.at("/terminalKey").asText(null)
+
+
+        val terminal = tap2PayService.validateTerminal(
+            terminalId,
+            terminalKey
+        )
+
+        val merchant = tap2PayService.validateMerchant(
+            terminal,
+            merchantId,
+            merchantKey
+        )
+
+        val response = JsonNodeFactory.instance.objectNode().apply {
+            put("merchantName", merchant.name)
+            put("merchantAddress", merchant.address)
+        }
+
+        return ResponseEntity.ok(response)
+    }
 
     @Operation(summary = "Do Payment Request")
     @PostMapping(
@@ -62,18 +98,19 @@ class EdcController(
         val hsm = hsmService.getHsm(hashCard, hashPin)
 
         // Construct Json Response
-        val response = JsonNodeFactory.instance.objectNode()
-        response.put(
-            "fromAddress", hsm.ownerAddress ?: throw ResponseStatusException(
-                HttpStatus.INTERNAL_SERVER_ERROR, "01|hsm.ownerAddress should not be null"
+        val response = JsonNodeFactory.instance.objectNode().apply {
+            put(
+                "fromAddress", hsm.ownerAddress ?: throw ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, "01|hsm.ownerAddress should not be null"
+                )
             )
-        )
-        response.put("toAddress", merchant.address)
-        response.put(
-            "secretKey", hsm.secretKey ?: throw ResponseStatusException(
-                HttpStatus.INTERNAL_SERVER_ERROR, "01|hsm.secretKey should not be null"
+            put("toAddress", merchant.address)
+            put(
+                "secretKey", hsm.secretKey ?: throw ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, "01|hsm.secretKey should not be null"
+                )
             )
-        )
+        }
 
         return ResponseEntity.ok(response)
     }
@@ -91,14 +128,18 @@ class EdcController(
         @RequestBody request: JsonNode
     ): ResponseEntity<String?> {
 
-        val merchantId = request.at("/merchantId").asText(null)
-        val merchantKey = request.at("/merchantKey").asText(null)
         val terminalId = request.at("/terminalId").asText(null)
         val terminalKey = request.at("/terminalKey").asText(null)
+
+        val merchantId = request.at("/merchantId").asText(null)
+        val merchantKey = request.at("/merchantKey").asText(null)
+
         val hashCard = request.at("/hashCard").asText(null)
         val hashPin = request.at("/hashPin").asText(null)
+
         val ethSignMessage = request.at("/ethSignMessage").asText(null)
         val ownerAddress = request.at("/ownerAddress").asText(null)
+
         val cardAddress = request.at("/cardAddress").asText(null)
         val chain = request.at("/chain").asText(null)
 

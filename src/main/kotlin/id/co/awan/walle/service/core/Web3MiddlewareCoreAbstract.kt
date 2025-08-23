@@ -22,6 +22,9 @@ abstract class Web3MiddlewareCoreAbstract(
     @Value("\${web3-mdw.password}")
     private lateinit var web3MiddlewarePassword: String
 
+    @Value("\${web3-mdw.master-key-wallet}")
+    protected lateinit var web3MasterPrivateKey: String
+
     protected fun get(
         coinGeckoPath: String,
         queryParams: LinkedMultiValueMap<String, String>? = null

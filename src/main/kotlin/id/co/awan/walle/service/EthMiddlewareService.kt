@@ -1,12 +1,10 @@
 package id.co.awan.walle.service
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import id.co.awan.walle.service.core.Web3MiddlewareCoreAbstract
 import id.co.awan.walle.utils.LogUtils
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.server.ResponseStatusException
@@ -32,7 +30,7 @@ class EthMiddlewareService(
     ): String {
 
         val recoveredAddress = ecRecover(message, signature)
-        if (address.equals(recoveredAddress, ignoreCase = true)) {
+        if (!address.equals(recoveredAddress, ignoreCase = true)) {
             throw ResponseStatusException(
                 HttpStatus.UNAUTHORIZED, "Signature ECRecover is not valid"
             )
@@ -50,7 +48,7 @@ class EthMiddlewareService(
         request.put("signature", signature)
 
         val reqToken = LogUtils.logHttpRequest(this.javaClass, "ecRecover", request)
-        val responseEntity: ResponseEntity<JsonNode?> = super.post("/api/web3/eth/read/ecRecover", null, request)
+        val responseEntity = super.post("/api/web3/eth/read/ecRecover", null, request)
         val responseJson = super.parseResponseJsonNode(responseEntity)
         LogUtils.logHttpResponse(reqToken, this.javaClass, responseJson)
 
@@ -78,7 +76,7 @@ class EthMiddlewareService(
         request.put("address", address)
 
         val reqToken = LogUtils.logHttpRequest(this.javaClass, "balanceOf", request)
-        val responseEntity: ResponseEntity<JsonNode?> = super.post("/api/web3/eth/read/balanceOf", null, request)
+        val responseEntity = super.post("/api/web3/eth/read/balanceOf", null, request)
         val responseJson = super.parseResponseJsonNode(responseEntity)
         LogUtils.logHttpResponse(reqToken, this.javaClass, responseJson)
 
@@ -92,9 +90,17 @@ class EthMiddlewareService(
     }
 
     fun gasPrice(
+        chain: String,
+        address: String,
     ): BigInteger {
 
-        val responseEntity: ResponseEntity<JsonNode?> = super.get("/api/web3/eth/read/gasPrice", null)
+        val request = JsonNodeFactory.instance.objectNode().apply {
+            put("chain", chain)
+            put("address", address)
+        }
+
+        val reqToken = LogUtils.logHttpRequest(this.javaClass, "gasPrice", request)
+        val responseEntity = super.post("/api/web3/eth/read/gasPrice", null, request)
         val responseJson = super.parseResponseJsonNode(responseEntity)
         LogUtils.logHttpResponseWithoutToken("gasPrice", this.javaClass, responseJson)
 
@@ -107,20 +113,22 @@ class EthMiddlewareService(
         return BigInteger(data)
     }
 
-    fun gasPriceEIP1559(
+    fun gasFeeEIP1559(
         chain: String,
-        destinationAddress: String,
-        amount: String
+        toAddress: String,
+        amount: BigInteger,
+        unit: String
     ): String {
 
         val request = JsonNodeFactory.instance.objectNode()
         request.put("chain", chain)
-        request.put("destinationAddress", destinationAddress)
-        request.put("amount", amount)
+        request.put("privateKey", super.web3MasterPrivateKey)
+        request.put("toAddress", toAddress)
+        request.put("amount", amount.toString())
+        request.put("unit", unit)
 
-        val reqToken = LogUtils.logHttpRequest(this.javaClass, "transferEtherEIP1559", request)
-        val responseEntity: ResponseEntity<JsonNode?> =
-            super.post("/api/web3/eth/simulate/transferWei.ts", null, request)
+        val reqToken = LogUtils.logHttpRequest(this.javaClass, "gasFeeEIP1559", request)
+        val responseEntity = super.post("/api/web3/eth/simulate/transferEIP1559", null, request)
         val responseJson = super.parseResponseJsonNode(responseEntity)
         LogUtils.logHttpResponse(reqToken, this.javaClass, responseJson)
 
@@ -145,12 +153,16 @@ class EthMiddlewareService(
     ) {
 
         val cardBalance: BigInteger = balanceOf(chain, cardAddress)
-        val gasFee: BigInteger = gasPrice().multiply(BigInteger.valueOf(70000L)) // Safe gas 70000L for transferFrom
+        val gasFee: BigInteger = gasPrice(chain, cardAddress)
+            .multiply(BigInteger.valueOf(70000L)) // Safe gas 70000L for transferFrom
 
         if (cardBalance < gasFee) {
 
             val amountForRecover = gasFee.subtract(cardBalance)
-            val transactionReceipt = transferEtherEIP1559(chain, cardAddress, amountForRecover, "WEI")
+
+            // TODO: Handle this later
+            gasFeeEIP1559(chain, cardAddress, amountForRecover, "WEI")
+            val transactionReceipt = transferEIP1559(chain, cardAddress, amountForRecover, "WEI")
 
             log.info(
                 "Gas fee recover from card adress {} with amount [{} wei], trx id[{}]",
@@ -168,7 +180,7 @@ class EthMiddlewareService(
         }
     }
 
-    fun transferEtherEIP1559(
+    fun transferEIP1559(
         chain: String,
         toAddress: String,
         amount: BigInteger,
@@ -177,12 +189,13 @@ class EthMiddlewareService(
 
         val request = JsonNodeFactory.instance.objectNode()
         request.put("chain", chain)
+        request.put("privateKey", super.web3MasterPrivateKey)
         request.put("toAddress", toAddress)
-        request.put("amount", amount)
+        request.put("amount", amount.toString())
         request.put("unit", unit)
 
-        val reqToken = LogUtils.logHttpRequest(this.javaClass, "transferEtherEIP1559", request)
-        val responseEntity: ResponseEntity<JsonNode?> = super.post("/api/web3/eth/transferEIP1559", null, request)
+        val reqToken = LogUtils.logHttpRequest(this.javaClass, "transferEIP1559", request)
+        val responseEntity = super.post("/api/web3/eth/write/transferEIP1559", null, request)
         val responseJson = super.parseResponseJsonNode(responseEntity)
         LogUtils.logHttpResponse(reqToken, this.javaClass, responseJson)
 
