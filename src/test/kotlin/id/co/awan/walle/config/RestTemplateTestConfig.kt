@@ -1,14 +1,14 @@
-package id.co.awan.walle;
+package id.co.awan.walle.config
 
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean
-import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer
 import org.springframework.core.io.ClassPathResource
 
 @TestConfiguration
-public class RestTemplateTestConfiguration {
+public class RestTemplateTestConfig {
 
     @Bean
     fun restTemplateBuilder() = RestTemplateBuilder()

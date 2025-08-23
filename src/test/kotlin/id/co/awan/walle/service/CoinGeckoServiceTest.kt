@@ -1,9 +1,8 @@
-package id.co.awan.walle
+package id.co.awan.walle.service
 
-
+import id.co.awan.walle.config.RestTemplateTestConfig
 import id.co.awan.walle.config.RestConfig
-import id.co.awan.walle.service.CoinGeckoService
-import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.slf4j.LoggerFactory
@@ -15,12 +14,11 @@ import java.math.BigDecimal
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(
     classes = [
-        RestTemplateTestConfiguration::class,
+        RestTemplateTestConfig::class,
         RestConfig::class,
         CoinGeckoService::class
     ]
 )
-//@TestPropertySource("classpath:application.yml")
 class CoinGeckoServiceTest {
 
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -30,7 +28,7 @@ class CoinGeckoServiceTest {
 
     @Test
     fun contextLoads() {
-        assertNotNull(service)
+        Assertions.assertNotNull(service)
     }
 
     @Test
