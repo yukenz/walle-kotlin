@@ -53,6 +53,7 @@ class CardController(
         @RequestBody request: JsonNode
     ): ResponseEntity<Any?> {
 
+        val chain = request.at("/chain").asText(null)
         val hashCard = request.at("/hashCard").asText(null)
         val hashPin = request.at("/hashPin").asText(null)
         val ethSignMessage = request.at("/ethSignMessage").asText(null)
@@ -60,6 +61,7 @@ class CardController(
 
         // Validate Signature
         val recoveredAddress = eip712MiddlewareService.validateSignerCardSelfService(
+            chain,
             CardSelfServiceOperation.REGISER,
             hashCard,
             hashPin,
@@ -78,7 +80,7 @@ class CardController(
 
     @Operation(summary = "Access Card")
     @PostMapping(
-        path = ["/card-access"],
+        path = ["/access"],
         consumes = [MediaType.APPLICATION_JSON_VALUE],
         produces = [MediaType.TEXT_PLAIN_VALUE]
     )
@@ -86,6 +88,7 @@ class CardController(
         @RequestBody request: JsonNode
     ): ResponseEntity<String?> {
 
+        val chain = request.at("/chain").asText(null)
         val hashCard = request.at("/hashCard").asText(null)
         val hashPin = request.at("/hashPin").asText(null)
         val ethSignMessage = request.at("/ethSignMessage").asText(null)
@@ -93,6 +96,7 @@ class CardController(
 
         // Validate Signature
         val recoveredAddress = eip712MiddlewareService.validateSignerCardSelfService(
+            chain,
             CardSelfServiceOperation.ACCESS,
             hashCard,
             hashPin,
@@ -119,6 +123,7 @@ class CardController(
         @RequestBody request: JsonNode
     ): ResponseEntity<Any?> {
 
+        val chain = request.at("/chain").asText(null)
         val hashCard = request.at("/hashCard").asText(null)
         val hashPin = request.at("/hashPin").asText(null)
         val ethSignMessage = request.at("/ethSignMessage").asText(null)
@@ -127,6 +132,7 @@ class CardController(
 
         // Validate Signature
         val recoveredAddress = eip712MiddlewareService.validateSignerCardSelfService(
+            chain,
             CardSelfServiceOperation.CHANGE_PIN,
             hashCard,
             hashPin,

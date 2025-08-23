@@ -35,7 +35,7 @@ class HSMService(
         return hsmRepository.findByIdAndPinAndOwnerAddress(
             id = hashCard,
             pin = hashPin,
-            ownerAddress
+            ownerAddress.lowercase()
         ) ?: throw ResponseStatusException(
             HttpStatus.NOT_FOUND, "HSM Not Found"
         )

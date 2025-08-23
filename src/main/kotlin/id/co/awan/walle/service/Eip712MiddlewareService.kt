@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException
 class Eip712MiddlewareService(restTemplate: RestTemplate) : Web3MiddlewareCoreAbstract(restTemplate) {
 
     fun getSignerCardSelfService(
+        chain: String,
         operation: CardSelfServiceOperation,
         hashCard: String,
         hashPin: String,
@@ -20,7 +21,7 @@ class Eip712MiddlewareService(restTemplate: RestTemplate) : Web3MiddlewareCoreAb
     ): String {
 
         val request = JsonNodeFactory.instance.objectNode()
-        request.put("chain", "anvil")
+        request.put("chain", chain)
         request.put("operation", operation.ordinal)
         request.put("hashCard", hashCard)
         request.put("hashPin", hashPin)
@@ -41,6 +42,7 @@ class Eip712MiddlewareService(restTemplate: RestTemplate) : Web3MiddlewareCoreAb
 
 
     fun validateSignerCardSelfService(
+        chain: String,
         operation: CardSelfServiceOperation,
         hashCard: String,
         hashPin: String,
@@ -48,9 +50,9 @@ class Eip712MiddlewareService(restTemplate: RestTemplate) : Web3MiddlewareCoreAb
         signerAddress: String
     ): String {
 
-        val recoveredAddress = getSignerCardSelfService(operation, hashCard, hashPin, signature)
+        val recoveredAddress = getSignerCardSelfService(chain, operation, hashCard, hashPin, signature)
 
-        if (recoveredAddress == signerAddress) {
+        if (!recoveredAddress.equals(signerAddress, ignoreCase = true)) {
             throw ResponseStatusException(
                 HttpStatus.UNAUTHORIZED, "Signer Validation Failed"
             )
