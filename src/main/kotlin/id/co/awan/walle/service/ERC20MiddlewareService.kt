@@ -25,6 +25,22 @@ class ERC20MiddlewareService(
     @Value("\${web3-mdw.master-key-wallet}")
     private lateinit var masterPrivateKey: String
 
+
+    /*
+     * =================================================================================================================
+     * UTILITY
+     * =================================================================================================================
+     */
+
+    fun parseAmountDecimal(
+        chain: String,
+        amount: BigInteger,
+        erc20Address: String
+    ): BigInteger {
+        val decimals = this.decimals(chain, erc20Address)
+        return amount.multiply(BigInteger.TEN.pow(decimals))
+    }
+
     /*
      * =================================================================================================================
      * INQUIRY
@@ -79,6 +95,31 @@ class ERC20MiddlewareService(
             )
 
         return BigInteger(data)
+    }
+
+    fun decimals(
+        chain: String,
+        erc20Address: String,
+    ): Int {
+
+        val request = JsonNodeFactory.instance.objectNode().apply {
+            put("chain", chain)
+            put("erc20Address", erc20Address)
+        }
+
+        val reqToken: String = LogUtils.logHttpRequest(this.javaClass, "decimals", request)
+        val responseEntity: ResponseEntity<JsonNode?> = post("/api/web3/erc20/read/decimals", null, request)
+        val responseJson = super.parseResponseJsonNode(responseEntity)
+        LogUtils.logHttpResponse(reqToken, this.javaClass, responseJson)
+
+
+        val data = responseJson.at("/data").also {
+            if (it.isNull) {
+                throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "01|data should not be null")
+            }
+        }.asInt()
+
+        return data
     }
 
     /*

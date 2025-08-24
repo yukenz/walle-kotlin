@@ -89,31 +89,43 @@ class MidtransNotificationCotroller(
         // SEND TOKEN
         // ========================================================
         var onchainReceipt: String? = null
+        rampTransactionService.inquiryTransactionReceipt(orderId).also {
+            if (it == null) {
+                if (
+                    (transactionStatusEnum == CAPTURE) ||
+                    (transactionStatusEnum == SETTLEMENT)
+                ) {
 
-        // Force NonNull for advance checking
-        val transactionReceipt = rampTransactionService.inquiryTransactionReceipt(orderId)
-        if (transactionReceipt == null) {
-            if (transactionStatusEnum == CAPTURE || transactionStatusEnum == SETTLEMENT) {
-                val onrampTransaction: OnrampTransaction = rampTransactionService.inquiryByOrderId(orderId)
-                onchainReceipt = eRC20MiddlewareService.transfer(
-                    onrampTransaction.chain,
-                    onrampTransaction.erc20Address,
-                    onrampTransaction.walletAddress,  // TODO: Working on decimals
-                    onrampTransaction.grossAmount.toString(),
-                    ERC20MiddlewareService.ScOperation.WRITE
-                )
+                    val onrampTransaction = rampTransactionService.inquiryByOrderId(orderId)
+
+                    val amountErc20Parsed = eRC20MiddlewareService.parseAmountDecimal(
+                        onrampTransaction.chain,
+                        onrampTransaction.grossAmount,
+                        onrampTransaction.erc20Address
+                    )
+
+                    onchainReceipt = eRC20MiddlewareService.transfer(
+                        onrampTransaction.chain,
+                        onrampTransaction.erc20Address,
+                        onrampTransaction.walletAddress,
+                        amountErc20Parsed.toString(),
+                        ERC20MiddlewareService.ScOperation.WRITE
+                    )
+                }
+            } else {
+                onchainReceipt = it
             }
-        } else {
-            onchainReceipt = transactionReceipt
         }
 
         // ========================================================
         // UPDATE TRANSACTION SECTION
         // ========================================================
         var settlementTimeDateTime: LocalDateTime? = null
-        if (settlementTime != null) {
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-            settlementTimeDateTime = LocalDateTime.parse(settlementTime, formatter)
+        settlementTime.also {
+            if (it != null) {
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                settlementTimeDateTime = LocalDateTime.parse(it, formatter)
+            }
         }
 
         rampTransactionService.updateTransactionOnRamp(

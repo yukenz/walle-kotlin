@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import java.math.BigInteger
 
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(
@@ -36,7 +37,7 @@ class ERC20MiddlewareServiceTest {
             "0x5FbDB2315678afecb367f032d93F642f64180aa3",
             "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
             "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
-            )
+        )
 
     }
 
@@ -49,6 +50,15 @@ class ERC20MiddlewareServiceTest {
     }
 
     @Test
+    fun parseAmountDecimal() {
+        val parseAmountDecimal = service.parseAmountDecimal(
+            "anvil",
+            BigInteger("10000"),
+            "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+        )
+        log.info("parseAmountDecimal: {}", parseAmountDecimal)
+    }
+
     fun approve() {
     }
 
