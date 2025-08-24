@@ -93,12 +93,10 @@ class EthMiddlewareService(
 
     fun gasPrice(
         chain: String,
-        address: String,
     ): BigInteger {
 
         val request = JsonNodeFactory.instance.objectNode().apply {
             put("chain", chain)
-            put("address", address)
         }
 
         val reqToken = LogUtils.logHttpRequest(this.javaClass, "gasPrice", request)
@@ -156,7 +154,7 @@ class EthMiddlewareService(
     ) {
 
         val cardBalance: BigInteger = balanceOf(chain, cardAddress)
-        val gasFee: BigInteger = gasPrice(chain, cardAddress)
+        val gasFee: BigInteger = gasPrice(chain)
             .multiply(BigInteger.valueOf(70000L)) // Safe gas 70000L for transferFrom
 
         if (cardBalance < gasFee) {
