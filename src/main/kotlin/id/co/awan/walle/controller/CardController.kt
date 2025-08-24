@@ -6,6 +6,7 @@ import id.co.awan.walle.service.Eip712MiddlewareService
 import id.co.awan.walle.service.EthMiddlewareService
 import id.co.awan.walle.service.HSMService
 import id.co.awan.walle.service.Tap2PayService
+import id.co.awan.walle.service.validation.CardControllerValidation
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -21,7 +22,8 @@ class CardController(
     private val tap2PayService: Tap2PayService,
     private val eip712MiddlewareService: Eip712MiddlewareService,
     private val hsmService: HSMService,
-    private val ethMiddlewareService: EthMiddlewareService
+    private val ethMiddlewareService: EthMiddlewareService,
+    private val validator: CardControllerValidation
 ) {
 
     @Operation(summary = "Query Cards")
@@ -53,11 +55,8 @@ class CardController(
         @RequestBody request: JsonNode
     ): ResponseEntity<Any?> {
 
-        val chain = request.at("/chain").asText(null)
-        val hashCard = request.at("/hashCard").asText(null)
-        val hashPin = request.at("/hashPin").asText(null)
-        val ethSignMessage = request.at("/ethSignMessage").asText(null)
-        val signerAddress = request.at("/signerAddress").asText(null)
+        // Destruct Request
+        val (chain, hashCard, hashPin, ethSignMessage, signerAddress) = validator.validateRegisterCard(request)
 
         // Validate Signature
         val recoveredAddress = eip712MiddlewareService.validateSignerCardSelfService(
@@ -88,11 +87,8 @@ class CardController(
         @RequestBody request: JsonNode
     ): ResponseEntity<String?> {
 
-        val chain = request.at("/chain").asText(null)
-        val hashCard = request.at("/hashCard").asText(null)
-        val hashPin = request.at("/hashPin").asText(null)
-        val ethSignMessage = request.at("/ethSignMessage").asText(null)
-        val signerAddress = request.at("/signerAddress").asText(null)
+        // Destruct Request
+        val (chain, hashCard, hashPin, ethSignMessage, signerAddress) = validator.validateAccessCard(request)
 
         // Validate Signature
         val recoveredAddress = eip712MiddlewareService.validateSignerCardSelfService(
@@ -123,12 +119,8 @@ class CardController(
         @RequestBody request: JsonNode
     ): ResponseEntity<Any?> {
 
-        val chain = request.at("/chain").asText(null)
-        val hashCard = request.at("/hashCard").asText(null)
-        val hashPin = request.at("/hashPin").asText(null)
-        val ethSignMessage = request.at("/ethSignMessage").asText(null)
-        val newHashPin = request.at("/newHashPin").asText(null)
-        val signerAddress = request.at("/signerAddress").asText(null)
+        // Destruct Request
+        val (chain, hashCard, hashPin, ethSignMessage, newHashPin, signerAddress) = validator.validateChangePin(request)
 
         // Validate Signature
         val recoveredAddress = eip712MiddlewareService.validateSignerCardSelfService(
