@@ -78,7 +78,7 @@ object JsonNodeUtils {
         val nullable: Boolean = false
     )
 
-    fun validateFieldDeprecated(jsonNode: JsonNode, predicate: List<JsonValidationPredicate>) {
+    fun validateFieldWithPredicate(jsonNode: JsonNode, predicate: List<JsonValidationPredicate>) {
 
         val errorListMessage = mutableListOf<String>()
 

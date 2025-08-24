@@ -6,6 +6,7 @@ import id.co.awan.walle.service.ERC20MiddlewareService
 import id.co.awan.walle.service.EthMiddlewareService
 import id.co.awan.walle.service.HSMService
 import id.co.awan.walle.service.Tap2PayService
+import id.co.awan.walle.service.validation.EdcControllerValidation
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -27,7 +28,8 @@ class EdcController(
     private val tap2PayService: Tap2PayService,
     private val hsmService: HSMService,
     private val ethMiddlewareService: EthMiddlewareService,
-    private val eRC20MiddlewareService: ERC20MiddlewareService
+    private val erc20MiddlewareService: ERC20MiddlewareService,
+    private val edcControllerValidation: EdcControllerValidation
 ) {
 
     @Operation(summary = "Inquiry Merchant")
@@ -40,11 +42,7 @@ class EdcController(
         @RequestBody request: JsonNode
     ): ResponseEntity<JsonNode?> {
 
-        val merchantId = request.at("/merchantId").asText(null)
-        val merchantKey = request.at("/merchantKey").asText(null)
-        val terminalId = request.at("/terminalId").asText(null)
-        val terminalKey = request.at("/terminalKey").asText(null)
-
+        val (merchantId, merchantKey, terminalId, terminalKey) = edcControllerValidation.validateMerchantInquiry(request)
 
         val terminal = tap2PayService.validateTerminal(
             terminalId,
@@ -75,13 +73,8 @@ class EdcController(
         @RequestBody request: JsonNode
     ): ResponseEntity<JsonNode?> {
 
-        val merchantId = request.at("/merchantId").asText(null)
-        val merchantKey = request.at("/merchantKey").asText(null)
-        val terminalId = request.at("/terminalId").asText(null)
-        val terminalKey = request.at("/terminalKey").asText(null)
-        val hashCard = request.at("/hashCard").asText(null)
-        val hashPin = request.at("/hashPin").asText(null)
-        val paymentAmount = request.at("/paymentAmount").asText(null)
+        val (merchantId, merchantKey, terminalId, terminalKey, hashCard, hashPin, paymentAmount)
+                = edcControllerValidation.validatePaymentRequest(request)
 
         // Validate Terminal
         val terminal = tap2PayService.validateTerminal(
@@ -96,7 +89,7 @@ class EdcController(
             merchantKey
         )
 
-        eRC20MiddlewareService
+        erc20MiddlewareService
 
         // Find HSM
         val hsm = hsmService.getHsm(hashCard, hashPin)
@@ -132,20 +125,8 @@ class EdcController(
         @RequestBody request: JsonNode
     ): ResponseEntity<String?> {
 
-        val terminalId = request.at("/terminalId").asText(null)
-        val terminalKey = request.at("/terminalKey").asText(null)
-
-        val merchantId = request.at("/merchantId").asText(null)
-        val merchantKey = request.at("/merchantKey").asText(null)
-
-        val hashCard = request.at("/hashCard").asText(null)
-        val hashPin = request.at("/hashPin").asText(null)
-
-        val ethSignMessage = request.at("/ethSignMessage").asText(null)
-        val ownerAddress = request.at("/ownerAddress").asText(null)
-
-        val cardAddress = request.at("/cardAddress").asText(null)
-        val chain = request.at("/chain").asText(null)
+        val (terminalId, terminalKey, merchantId, merchantKey, hashCard, hashPin, ethSignMessage, ownerAddress, cardAddress, chain)
+                = edcControllerValidation.validateCardGassRecovery(request)
 
         // Validate Signature
         val message = String.format(

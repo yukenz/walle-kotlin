@@ -15,6 +15,23 @@ class CardControllerValidation {
         val signerAddress: String
     )
 
+    data class AccessCardRequestPayload(
+        val chain: String,
+        val hashCard: String,
+        val hashPin: String,
+        val ethSignMessage: String,
+        val signerAddress: String
+    )
+
+    data class ChangePinRequestPayload(
+        val chain: String,
+        val hashCard: String,
+        val hashPin: String,
+        val ethSignMessage: String,
+        val newHashPin: String,
+        val signerAddress: String
+    )
+
     fun validateRegisterCard(request: JsonNode): RegisterCardRequestPayload {
 
         val chain = JsonNodeUtils.validateField(request, "/chain", String::class)!!
@@ -32,15 +49,6 @@ class CardControllerValidation {
         )
     }
 
-
-    data class AccessCardRequestPayload(
-        val chain: String,
-        val hashCard: String,
-        val hashPin: String,
-        val ethSignMessage: String,
-        val signerAddress: String
-    )
-
     fun validateAccessCard(request: JsonNode): AccessCardRequestPayload {
 
         val chain = JsonNodeUtils.validateField(request, "/chain", String::class)!!
@@ -57,15 +65,6 @@ class CardControllerValidation {
             signerAddress = signerAddress
         )
     }
-
-    data class ChangePinRequestPayload(
-        val chain: String,
-        val hashCard: String,
-        val hashPin: String,
-        val ethSignMessage: String,
-        val newHashPin: String,
-        val signerAddress: String
-    )
 
     fun validateChangePin(request: JsonNode): ChangePinRequestPayload {
 

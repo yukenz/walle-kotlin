@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import id.co.awan.walle.service.MidtransService
 import id.co.awan.walle.service.RampTransactionService
+import id.co.awan.walle.service.validation.FundControllerValidation
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -17,7 +18,8 @@ import java.math.BigInteger
 class FundController(
     private val rampTransactionService: RampTransactionService,
     private val midtransService: MidtransService,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val fundControllerValidation: FundControllerValidation
 ) {
 
     @GetMapping(
@@ -41,15 +43,8 @@ class FundController(
         @RequestBody request: JsonNode
     ): ResponseEntity<JsonNode> {
 
-        // TODO : Validate this field
-        val firstName = request.at("/first_name").asText(null)
-        val lastName = request.at("/last_name").asText(null)
-        val email = request.at("/email").asText(null)
-        val phone = request.at("/phone").asText(null)
-        val walletAddress = request.at("/wallet_address").asText(null)
-        val chain = request.at("/chain").asText(null)
-        val erc20Address = request.at("/erc20_address").asText(null)
-        val amount = request.at("/amount").asInt()
+        val (firstName, lastName, email, phone, walletAddress, chain, erc20Address, amount)
+                = fundControllerValidation.validateCreateOnRamp(request)
 
         // Create OnRamp Phase 1
         val orderId: String = rampTransactionService.createTransactionOnRampFirstPhase(
