@@ -15,7 +15,7 @@ class ErrorController {
         // Customize your error response here
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body<Any>(Map.of<String?, String?>("error", ex.message))
+            .body<Any>(mapOf("error" to ex.message))
     }
 
     @ExceptionHandler(ResponseStatusException::class)
@@ -23,12 +23,7 @@ class ErrorController {
         // Customize your error response here
         return ResponseEntity
             .status(ex.statusCode)
-            .body<Any>(
-                Map.of<String, String>(
-                    "error",
-                    ex.reason ?: "General Error"
-                )
-            )
+            .body(mapOf("error" to (ex.reason ?: "General Error")))
     }
 
 }
