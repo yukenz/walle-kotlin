@@ -2,6 +2,7 @@ package id.co.awan.walle.service
 
 import id.co.awan.walle.config.RestTemplateTestConfig
 import id.co.awan.walle.config.RestConfig
+import id.co.awan.walle.service.coingecko.CoinGeckoService
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

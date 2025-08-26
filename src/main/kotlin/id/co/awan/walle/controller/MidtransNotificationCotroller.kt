@@ -3,9 +3,9 @@ package id.co.awan.walle.controller
 import com.fasterxml.jackson.databind.JsonNode
 import id.co.awan.walle.constant.MidtransTransactionStatus.*
 import id.co.awan.walle.entity.OnrampTransaction
-import id.co.awan.walle.service.ERC20MiddlewareService
-import id.co.awan.walle.service.MidtransNotificationService
-import id.co.awan.walle.service.RampTransactionService
+import id.co.awan.walle.service.web3middleware.ERC20MiddlewareService
+import id.co.awan.walle.service.midtrans.MidtransNotificationService
+import id.co.awan.walle.service.dao.RampTransactionService
 import id.co.awan.walle.utils.LogUtils
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
@@ -40,7 +40,7 @@ class MidtransNotificationCotroller(
         @RequestBody request: JsonNode
     ): ResponseEntity<String?> {
 
-        val reqToken = LogUtils.logHttpRequest(this.javaClass, "paymentNotification", request)
+        LogUtils.logHttpRequest(this.javaClass, "paymentNotification", request)
 
         midtransNotificationService.validateSignature(request)
 

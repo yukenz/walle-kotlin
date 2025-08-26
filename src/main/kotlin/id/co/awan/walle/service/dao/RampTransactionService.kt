@@ -1,4 +1,4 @@
-package id.co.awan.walle.service
+package id.co.awan.walle.service.dao
 
 import id.co.awan.walle.entity.OnrampTransaction
 import id.co.awan.walle.repository.OnrampTransactionRepository

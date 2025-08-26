@@ -1,11 +1,16 @@
 package id.co.awan.walle.service.validation
 
 import com.fasterxml.jackson.databind.JsonNode
-import id.co.awan.walle.utils.JsonNodeUtils
+import com.fasterxml.jackson.databind.ObjectMapper
+import id.co.awan.walle.service.core.ValidationCoreAbstract
+import jakarta.validation.Validator
 import org.springframework.stereotype.Service
 
 @Service
-class EdcControllerValidation {
+class EdcControllerValidation(
+    validator: Validator,
+    private val objectMapper: ObjectMapper
+) : ValidationCoreAbstract(validator) {
 
     data class MerchantInquiryRequestPayload(
         val merchantId: String,
@@ -38,67 +43,21 @@ class EdcControllerValidation {
     )
 
     fun validateMerchantInquiry(request: JsonNode): MerchantInquiryRequestPayload {
-
-        val merchantId = JsonNodeUtils.validateField(request, "/merchantId", String::class)!!
-        val merchantKey = JsonNodeUtils.validateField(request, "/merchantKey", String::class)!!
-        val terminalId = JsonNodeUtils.validateField(request, "/terminalId", String::class)!!
-        val terminalKey = JsonNodeUtils.validateField(request, "/terminalKey", String::class)!!
-
-        return MerchantInquiryRequestPayload(
-            merchantId = merchantId,
-            merchantKey = merchantKey,
-            terminalId = terminalId,
-            terminalKey = terminalKey
-        )
+        val requestPojo = objectMapper.treeToValue(request, MerchantInquiryRequestPayload::class.java)
+        super.validate(requestPojo)
+        return requestPojo
     }
 
     fun validatePaymentRequest(request: JsonNode): PaymentRequestRequestPayload {
-
-        val merchantId = JsonNodeUtils.validateField(request, "/merchantId", String::class)!!
-        val merchantKey = JsonNodeUtils.validateField(request, "/merchantKey", String::class)!!
-        val terminalId = JsonNodeUtils.validateField(request, "/terminalId", String::class)!!
-        val terminalKey = JsonNodeUtils.validateField(request, "/terminalKey", String::class)!!
-        val hashCard = JsonNodeUtils.validateField(request, "/hashCard", String::class)!!
-        val hashPin = JsonNodeUtils.validateField(request, "/hashPin", String::class)!!
-        val paymentAmount = JsonNodeUtils.validateField(request, "/paymentAmount", String::class)!!
-
-        return PaymentRequestRequestPayload(
-            merchantId = merchantId,
-            merchantKey = merchantKey,
-            terminalId = terminalId,
-            terminalKey = terminalKey,
-            hashCard = hashCard,
-            hashPin = hashPin,
-            paymentAmount = paymentAmount
-        )
+        val requestPojo = objectMapper.treeToValue(request, PaymentRequestRequestPayload::class.java)
+        super.validate(requestPojo)
+        return requestPojo
     }
 
     fun validateCardGassRecovery(request: JsonNode): CardGassRecoveryRequestPayload {
-
-        val terminalId = JsonNodeUtils.validateField(request, "/terminalId", String::class)!!
-        val terminalKey = JsonNodeUtils.validateField(request, "/terminalKey", String::class)!!
-        val merchantId = JsonNodeUtils.validateField(request, "/merchantId", String::class)!!
-        val merchantKey = JsonNodeUtils.validateField(request, "/merchantKey", String::class)!!
-        val hashCard = JsonNodeUtils.validateField(request, "/hashCard", String::class)!!
-        val hashPin = JsonNodeUtils.validateField(request, "/hashPin", String::class)!!
-        val ethSignMessage = JsonNodeUtils.validateField(request, "ethSignMessage", String::class)!!
-        val ownerAddress = JsonNodeUtils.validateField(request, "/ownerAddress", String::class)!!
-        val cardAddress = JsonNodeUtils.validateField(request, "/cardAddress", String::class)!!
-        val chain = JsonNodeUtils.validateField(request, "/chain", String::class)!!
-
-
-        return CardGassRecoveryRequestPayload(
-            terminalId = terminalId,
-            terminalKey = terminalKey,
-            merchantId = merchantId,
-            merchantKey = merchantKey,
-            hashCard = hashCard,
-            hashPin = hashPin,
-            ethSignMessage = ethSignMessage,
-            ownerAddress = ownerAddress,
-            cardAddress = cardAddress,
-            chain = chain
-        )
+        val requestPojo = objectMapper.treeToValue(request, CardGassRecoveryRequestPayload::class.java)
+        super.validate(requestPojo)
+        return requestPojo
     }
 }
 

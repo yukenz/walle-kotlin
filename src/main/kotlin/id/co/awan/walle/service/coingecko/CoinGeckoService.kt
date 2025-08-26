@@ -1,4 +1,4 @@
-package id.co.awan.walle.service
+package id.co.awan.walle.service.coingecko
 
 import com.fasterxml.jackson.databind.JsonNode
 import id.co.awan.walle.service.core.CoinGeckoCoreAbstract

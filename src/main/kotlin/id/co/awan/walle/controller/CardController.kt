@@ -2,10 +2,10 @@ package id.co.awan.walle.controller
 
 import com.fasterxml.jackson.databind.JsonNode
 import id.co.awan.walle.constant.CardSelfServiceOperation
-import id.co.awan.walle.service.Eip712MiddlewareService
-import id.co.awan.walle.service.EthMiddlewareService
-import id.co.awan.walle.service.HSMService
-import id.co.awan.walle.service.Tap2PayService
+import id.co.awan.walle.service.web3middleware.Eip712MiddlewareService
+import id.co.awan.walle.service.web3middleware.EthMiddlewareService
+import id.co.awan.walle.service.dao.HSMService
+import id.co.awan.walle.service.dao.Tap2PayService
 import id.co.awan.walle.service.validation.CardControllerValidation
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.MediaType

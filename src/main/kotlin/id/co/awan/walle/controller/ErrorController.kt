@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.server.ResponseStatusException
-import java.util.Map
 
 @RestControllerAdvice
 class ErrorController {
@@ -15,7 +14,7 @@ class ErrorController {
         // Customize your error response here
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body<Any>(Map.of<String?, String?>("error", ex.message))
+            .body(mapOf(Pair("error", ex.message)))
     }
 
     @ExceptionHandler(ResponseStatusException::class)
@@ -24,9 +23,11 @@ class ErrorController {
         return ResponseEntity
             .status(ex.statusCode)
             .body<Any>(
-                Map.of<String, String>(
-                    "error",
-                    ex.reason ?: "General Error"
+                mapOf(
+                    Pair(
+                        "error",
+                        ex.reason ?: "General Error"
+                    )
                 )
             )
     }

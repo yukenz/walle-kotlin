@@ -1,6 +1,6 @@
 package id.co.awan.walle.controller
 
-import id.co.awan.walle.service.HSMService
+import id.co.awan.walle.service.dao.HSMService
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity

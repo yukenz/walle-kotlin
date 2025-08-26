@@ -3,8 +3,8 @@ package id.co.awan.walle.controller
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import id.co.awan.walle.service.MidtransService
-import id.co.awan.walle.service.RampTransactionService
+import id.co.awan.walle.service.midtrans.MidtransService
+import id.co.awan.walle.service.dao.RampTransactionService
 import id.co.awan.walle.service.validation.FundControllerValidation
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
