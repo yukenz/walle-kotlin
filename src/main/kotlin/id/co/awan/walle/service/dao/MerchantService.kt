@@ -14,7 +14,7 @@ import java.security.SecureRandom
 import java.util.*
 
 @Service
-class Tap2PayService(
+class MerchantService(
     private val hsmRepository: HsmRepository,
     private val terminalRepository: TerminalRepository
 ) {
@@ -45,42 +45,6 @@ class Tap2PayService(
         return merchant
     }
 
-    fun validateTerminal(
-        terminalId: String,
-        terminalKey: String
-    ): Terminal {
-        return terminalRepository.findByIdAndKey(terminalId, terminalKey)
-            ?: throw ResponseStatusException(
-                HttpStatus.UNAUTHORIZED, "Terminal validation exception"
-            )
-    }
-
-    @Transactional
-    fun createCard(
-        hashCard: String,
-        hashPin: String,
-        ownerAddress: String
-    ) {
-
-        val hsmResult: Optional<Hsm> = hsmRepository.findById(hashCard)
-        // Cord not issued
-        if (hsmResult.isEmpty) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Card UUID not valid")
-        }
-
-        val hsm: Hsm = hsmResult.get()
-
-        // Cord already registered with some address
-        if (hsm.ownerAddress != null) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Card already registered")
-        }
-
-        hsm.ownerAddress = ownerAddress.lowercase(Locale.getDefault())
-        hsm.pin = hashPin
-        hsm.secretKey = Hex.encodeHexString(SecureRandom.getInstanceStrong().generateSeed(32))
-
-        hsmRepository.save(hsm)
-    }
 
     fun getCards(ownerAddress: String): MutableList<String> {
         return hsmRepository.findAllByOwnerAddress(ownerAddress.lowercase())

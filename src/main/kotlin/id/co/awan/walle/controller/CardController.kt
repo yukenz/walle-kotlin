@@ -5,7 +5,7 @@ import id.co.awan.walle.constant.CardSelfServiceOperation
 import id.co.awan.walle.service.web3middleware.Eip712MiddlewareService
 import id.co.awan.walle.service.web3middleware.EthMiddlewareService
 import id.co.awan.walle.service.dao.HSMService
-import id.co.awan.walle.service.dao.Tap2PayService
+import id.co.awan.walle.service.dao.MerchantService
 import id.co.awan.walle.service.validation.CardControllerValidation
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.MediaType
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1/card")
 class CardController(
-    private val tap2PayService: Tap2PayService,
+    private val merchantService: MerchantService,
     private val eip712MiddlewareService: Eip712MiddlewareService,
     private val hsmService: HSMService,
     private val ethMiddlewareService: EthMiddlewareService,
@@ -40,7 +40,7 @@ class CardController(
         val addressRecovered = ethMiddlewareService.ecRecover("CARD_QUERY", ethSignMessage)
 
         // Query Cards
-        val cards = tap2PayService.getCards(addressRecovered)
+        val cards = merchantService.getCards(addressRecovered)
 
         return ResponseEntity.ok(cards)
     }
@@ -69,7 +69,7 @@ class CardController(
         )
 
         // Create HSM
-        tap2PayService.createCard(
+        hsmService.createCard(
             hashCard, hashPin,
             ownerAddress = recoveredAddress
         )

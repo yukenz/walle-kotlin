@@ -5,7 +5,8 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import id.co.awan.walle.service.web3middleware.ERC20MiddlewareService
 import id.co.awan.walle.service.web3middleware.EthMiddlewareService
 import id.co.awan.walle.service.dao.HSMService
-import id.co.awan.walle.service.dao.Tap2PayService
+import id.co.awan.walle.service.dao.MerchantService
+import id.co.awan.walle.service.dao.TerminalService
 import id.co.awan.walle.service.validation.EdcControllerValidation
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.HttpStatus
@@ -24,11 +25,12 @@ import kotlin.arrayOf
 @RestController
 @RequestMapping("/api/v1/edc")
 class EdcController(
-    private val tap2PayService: Tap2PayService,
+    private val merchantService: MerchantService,
     private val hsmService: HSMService,
     private val ethMiddlewareService: EthMiddlewareService,
     private val erc20MiddlewareService: ERC20MiddlewareService,
-    private val edcControllerValidation: EdcControllerValidation
+    private val edcControllerValidation: EdcControllerValidation,
+    private val terminalService: TerminalService
 ) {
 
     @Operation(summary = "Inquiry Merchant")
@@ -43,12 +45,12 @@ class EdcController(
 
         val (merchantId, merchantKey, terminalId, terminalKey) = edcControllerValidation.validateMerchantInquiry(request)
 
-        val terminal = tap2PayService.validateTerminal(
+        val terminal = terminalService.validateTerminal(
             terminalId,
             terminalKey
         )
 
-        val merchant = tap2PayService.validateMerchant(
+        val merchant = merchantService.validateMerchant(
             terminal,
             merchantId,
             merchantKey
@@ -76,13 +78,13 @@ class EdcController(
                 = edcControllerValidation.validatePaymentRequest(request)
 
         // Validate Terminal
-        val terminal = tap2PayService.validateTerminal(
+        val terminal = terminalService.validateTerminal(
             terminalId,
             terminalKey
         )
 
         // Validate Merchant
-        val merchant = tap2PayService.validateMerchant(
+        val merchant = merchantService.validateMerchant(
             terminal,
             merchantId,
             merchantKey
@@ -141,13 +143,13 @@ class EdcController(
         ethMiddlewareService.validateEthSign(message, cardAddress, ethSignMessage)
 
         // Validate Terminal
-        val terminal = tap2PayService.validateTerminal(
+        val terminal = terminalService.validateTerminal(
             terminalId,
             terminalKey
         )
 
         // Validate Merchant
-        tap2PayService.validateMerchant(
+        merchantService.validateMerchant(
             terminal,
             merchantId,
             merchantKey
