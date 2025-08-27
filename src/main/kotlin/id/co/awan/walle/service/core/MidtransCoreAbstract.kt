@@ -129,7 +129,7 @@ abstract class MidtransCoreAbstract(
                 HttpStatus.INTERNAL_SERVER_ERROR, "01|ResponseJson should not be null"
             )
 
-        if ((responseEntity.statusCode != HttpStatus.OK) && (responseEntity.statusCode != HttpStatus.CREATED)) {
+        if ((responseEntity.statusCode != HttpStatus.OK) and (responseEntity.statusCode != HttpStatus.CREATED)) {
             throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "01" + "|" + responseEntity.statusCode)
         }
 

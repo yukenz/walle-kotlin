@@ -91,10 +91,7 @@ class MidtransNotificationCotroller(
         var onchainReceipt: String? = null
         rampTransactionService.inquiryTransactionReceipt(orderId).also {
             if (it == null) {
-                if (
-                    (transactionStatusEnum == CAPTURE) ||
-                    (transactionStatusEnum == SETTLEMENT)
-                ) {
+                if ((transactionStatusEnum == CAPTURE) or (transactionStatusEnum == SETTLEMENT)) {
 
                     val onrampTransaction = rampTransactionService.inquiryByOrderId(orderId)
 
