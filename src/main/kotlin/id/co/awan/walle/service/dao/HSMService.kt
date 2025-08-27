@@ -8,8 +8,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 import java.security.SecureRandom
-import java.util.Locale
-import java.util.Optional
+import java.util.*
 
 @Service
 class HSMService(
@@ -25,7 +24,6 @@ class HSMService(
     ) {
         val hsm: Hsm = getHsm(hashCard, hashPin, ownerAddress)
         hsm.pin = newHashPin
-
         hsmRepository.save(hsm)
     }
 
@@ -34,28 +32,22 @@ class HSMService(
         hashCard: String,
         hashPin: String,
         ownerAddress: String
-    ): Hsm {
+    ): Hsm = hsmRepository.findByIdAndPinAndOwnerAddress(
+        id = hashCard,
+        pin = hashPin,
+        ownerAddress.lowercase()
+    ) ?: throw ResponseStatusException(
+        HttpStatus.NOT_FOUND, "HSM Not Found"
+    )
 
-        return hsmRepository.findByIdAndPinAndOwnerAddress(
-            id = hashCard,
-            pin = hashPin,
-            ownerAddress.lowercase()
-        ) ?: throw ResponseStatusException(
-            HttpStatus.NOT_FOUND, "HSM Not Found"
-        )
-    }
 
     fun getHsm(
         hashCard: String,
         hashPin: String
-    ): Hsm {
-
-        return hsmRepository.findByIdAndPin(hashCard, hashPin)
-            ?: throw ResponseStatusException(
-                HttpStatus.NOT_FOUND, "HSM Not Found"
-            )
-    }
-
+    ): Hsm = hsmRepository.findByIdAndPin(hashCard, hashPin)
+        ?: throw ResponseStatusException(
+            HttpStatus.NOT_FOUND, "HSM Not Found"
+        )
 
     @Transactional
     fun resetHsm(
@@ -104,6 +96,9 @@ class HSMService(
             .mapNotNull { it.id }   // Kotlin way - maps and filters nulls
             .toMutableList()        // Convert to MutableList)
     }
+
+    fun getOwnerById(hashCard: String) = hsmRepository.findOwnerByHashCard(hashCard.lowercase())
+        ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "HSM Not Found")
 
 
 }
