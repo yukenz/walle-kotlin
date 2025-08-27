@@ -1,25 +1,34 @@
 package id.co.awan.walle.service.dao
 
-import id.co.awan.walle.entity.Hsm
 import id.co.awan.walle.entity.Merchant
 import id.co.awan.walle.entity.Terminal
 import id.co.awan.walle.repository.HsmRepository
+import id.co.awan.walle.repository.MerchantRepository
 import id.co.awan.walle.repository.TerminalRepository
-import org.apache.hc.client5.http.utils.Hex
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import java.security.SecureRandom
-import java.util.*
 
 @Service
 class MerchantService(
     private val hsmRepository: HsmRepository,
+    private val merchantRepository: MerchantRepository,
     private val terminalRepository: TerminalRepository
 ) {
 
+
     fun validateMerchant(
+        merchantId: String,
+    ): Merchant {
+
+        return merchantRepository.findById(merchantId).orElseThrow {
+            ResponseStatusException(
+                HttpStatus.UNAUTHORIZED, "Merchant ID isn't valid"
+            )
+        }
+    }
+
+    fun validateMerchantWithTerminal(
         terminal: Terminal,
         merchantId: String,
         merchantKey: String
@@ -43,12 +52,5 @@ class MerchantService(
         }
 
         return merchant
-    }
-
-
-    fun getCards(ownerAddress: String): MutableList<String> {
-        return hsmRepository.findAllByOwnerAddress(ownerAddress.lowercase())
-            .mapNotNull { it.id }   // Kotlin way - maps and filters nulls
-            .toMutableList()        // Convert to MutableList)
     }
 }

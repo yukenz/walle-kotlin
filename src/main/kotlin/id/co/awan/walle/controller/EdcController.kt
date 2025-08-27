@@ -50,7 +50,7 @@ class EdcController(
             terminalKey
         )
 
-        val merchant = merchantService.validateMerchant(
+        val merchant = merchantService.validateMerchantWithTerminal(
             terminal,
             merchantId,
             merchantKey
@@ -84,7 +84,7 @@ class EdcController(
         )
 
         // Validate Merchant
-        val merchant = merchantService.validateMerchant(
+        val merchant = merchantService.validateMerchantWithTerminal(
             terminal,
             merchantId,
             merchantKey
@@ -149,7 +149,7 @@ class EdcController(
         )
 
         // Validate Merchant
-        merchantService.validateMerchant(
+        merchantService.validateMerchantWithTerminal(
             terminal,
             merchantId,
             merchantKey

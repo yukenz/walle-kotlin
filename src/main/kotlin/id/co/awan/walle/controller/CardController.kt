@@ -40,7 +40,7 @@ class CardController(
         val addressRecovered = ethMiddlewareService.ecRecover("CARD_QUERY", ethSignMessage)
 
         // Query Cards
-        val cards = merchantService.getCards(addressRecovered)
+        val cards = hsmService.getCards(addressRecovered)
 
         return ResponseEntity.ok(cards)
     }
