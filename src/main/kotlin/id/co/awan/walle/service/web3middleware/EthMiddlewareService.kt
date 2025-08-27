@@ -1,4 +1,4 @@
-package id.co.awan.walle.service
+package id.co.awan.walle.service.web3middleware
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import id.co.awan.walle.service.core.Web3MiddlewareCoreAbstract
@@ -99,7 +99,7 @@ class EthMiddlewareService(
             put("chain", chain)
         }
 
-        val reqToken = LogUtils.logHttpRequest(this.javaClass, "gasPrice", request)
+        LogUtils.logHttpRequest(this.javaClass, "gasPrice", request)
         val responseEntity = super.post("/api/web3/eth/read/gasPrice", null, request)
         val responseJson = super.parseResponseJsonNode(responseEntity)
         LogUtils.logHttpResponseWithoutToken("gasPrice", this.javaClass, responseJson)

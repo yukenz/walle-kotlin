@@ -2,6 +2,7 @@ package id.co.awan.walle.service
 
 import id.co.awan.walle.config.RestConfig
 import id.co.awan.walle.config.RestTemplateTestConfig
+import id.co.awan.walle.service.web3middleware.ERC20MiddlewareService
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.slf4j.LoggerFactory
@@ -27,12 +28,12 @@ class ERC20MiddlewareServiceTest {
 
     @Test
     fun totalSupply() {
-        val totalSupply = service.totalSupply("anvil", "0x5FbDB2315678afecb367f032d93F642f64180aa3")
+        service.totalSupply("anvil", "0x5FbDB2315678afecb367f032d93F642f64180aa3")
     }
 
     @Test
     fun allowance() {
-        val totalSupply = service.allowance(
+        service.allowance(
             "anvil",
             "0x5FbDB2315678afecb367f032d93F642f64180aa3",
             "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",

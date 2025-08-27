@@ -1,4 +1,4 @@
-package id.co.awan.walle.service
+package id.co.awan.walle.service.web3middleware
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.JsonNodeFactory

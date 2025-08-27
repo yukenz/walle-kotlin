@@ -1,11 +1,16 @@
 package id.co.awan.walle.service.validation
 
 import com.fasterxml.jackson.databind.JsonNode
-import id.co.awan.walle.utils.JsonNodeUtils
+import com.fasterxml.jackson.databind.ObjectMapper
+import id.co.awan.walle.service.core.ValidationCoreAbstract
+import jakarta.validation.Validator
 import org.springframework.stereotype.Service
 
 @Service
-class FundControllerValidation {
+class FundControllerValidation(
+    validator: Validator,
+    private val objectMapper: ObjectMapper
+) : ValidationCoreAbstract(validator) {
 
     data class CreateOnRampRequestPayload(
         val firstName: String,
@@ -19,26 +24,9 @@ class FundControllerValidation {
     )
 
     fun validateCreateOnRamp(request: JsonNode): CreateOnRampRequestPayload {
-
-        val firstName = JsonNodeUtils.validateField(request, "/firstName", String::class)!!
-        val lastName = JsonNodeUtils.validateField(request, "/lastName", String::class)!!
-        val email = JsonNodeUtils.validateField(request, "/email", String::class)!!
-        val phone = JsonNodeUtils.validateField(request, "/phone", String::class)!!
-        val walletAddress = JsonNodeUtils.validateField(request, "/walletAddress", String::class)!!
-        val chain = JsonNodeUtils.validateField(request, "/chain", String::class)!!
-        val erc20Address = JsonNodeUtils.validateField(request, "/erc20Address", String::class)!!
-        val amount = JsonNodeUtils.validateField(request, "/amount", Int::class)!!
-
-        return CreateOnRampRequestPayload(
-            firstName = firstName,
-            lastName = lastName,
-            email = email,
-            phone = phone,
-            walletAddress = walletAddress,
-            chain = chain,
-            erc20Address = erc20Address,
-            amount = amount
-        )
+        val requestPojo = objectMapper.treeToValue(request, CreateOnRampRequestPayload::class.java)
+        super.validate(requestPojo)
+        return requestPojo
     }
 
 }
