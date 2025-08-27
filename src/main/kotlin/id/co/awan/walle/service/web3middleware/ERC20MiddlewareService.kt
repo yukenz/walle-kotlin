@@ -47,6 +47,31 @@ class ERC20MiddlewareService(
      * =================================================================================================================
      */
 
+    fun balanceOf(
+        chain: String,
+        erc20Address: String,
+        walletAddress: String
+    ): BigInteger {
+
+        val request = JsonNodeFactory.instance.objectNode().apply {
+            put("chain", chain)
+            put("erc20Address", erc20Address)
+            put("walletAddress", walletAddress)
+        }
+
+        val reqToken = LogUtils.logHttpRequest(this.javaClass, "balanceOf", request)
+        val responseEntity: ResponseEntity<JsonNode?> = super.post("/api/web3/erc20/read/balanceOf", null, request)
+        val responseJson = super.parseResponseJsonNode(responseEntity)
+        LogUtils.logHttpResponse(reqToken, this.javaClass, responseJson)
+
+        val data = responseJson.at("/data").asText(null)
+            ?: throw ResponseStatusException(
+                HttpStatus.INTERNAL_SERVER_ERROR, "01|data should not be null"
+            )
+
+        return BigInteger(data)
+    }
+
     fun totalSupply(
         chain: String,
         erc20Address: String
