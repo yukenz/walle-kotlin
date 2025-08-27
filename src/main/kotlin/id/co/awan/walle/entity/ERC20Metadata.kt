@@ -10,7 +10,7 @@ class ERC20Metadata {
     @Column(name = "id")
     lateinit var address: String
 
-    @Column(name = "token_name")
+    @Column(name = "token_symbol")
     lateinit var tokenSymbol: String;
 
     @Column(name = "token_name")
