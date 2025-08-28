@@ -6,6 +6,7 @@ import id.co.awan.walle.service.dao.ChainService
 import id.co.awan.walle.service.dao.Erc20MetadataService
 import id.co.awan.walle.service.dao.HSMService
 import id.co.awan.walle.service.dao.MerchantService
+import id.co.awan.walle.service.validation.CardControllerValidation
 import id.co.awan.walle.service.validation.QrControllerValidation
 import id.co.awan.walle.service.web3middleware.ERC20MiddlewareService
 import io.swagger.v3.oas.annotations.Operation
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1/qr")
 class QrController(
     private val merchantService: MerchantService,
+    private val validator: CardControllerValidation,
     private val qrControllerValidation: QrControllerValidation,
     private val hsmService: HSMService,
     private val chainService: ChainService,
@@ -27,11 +29,12 @@ class QrController(
 
     @Operation(summary = "Query QR Merchant")
     @GetMapping(
-        path = ["/query"],
+        path = ["/inquiry"],
         produces = [MediaType.APPLICATION_JSON_VALUE]
     )
     fun qrInquiry(
         @RequestParam(name = "merchantId") merchantId: String,
+        @RequestParam(name = "cardAddress") cardAddress: String,
     ): ResponseEntity<Any?> {
 
         val merchant = merchantService.validateMerchant(merchantId)
@@ -56,32 +59,14 @@ class QrController(
     ): ResponseEntity<*> {
 
         val walletAddress = hsmService.getOwnerById(hashCard)
-
         val response = chainService.getAllRegisteredChain()
-            .associate { it1 -> // Loop chain
-                /* return it1 */ try {
-                    val erc20Details = erc20MetadataService.getAllErc20ByChain(it1)
-                        .associate { it2 -> // Loop ERC20 in Chain
-                            /* return it2 */ try {
-                                val allowance = eRC20MiddlewareService.allowance(
-                                    it1.chainName,
-                                    it2.address,
-                                    walletAddress,
-                                    cardAddress,
-                                )
-                                val balanceOf = eRC20MiddlewareService.balanceOf(
-                                    it1.chainName,
-                                    it2.address,
-                                    walletAddress
-                                )
-                                it2.address to arrayOf(allowance, balanceOf)
-                            } catch (e: Exception) {
-                                it2.address to emptyArray()
-                            }
-                        }
-                    it1.chainName to erc20Details
+            .associate {
+                try {
+                    val allErc20DetailsByChain =
+                        erc20MetadataService.getAllErc20DetailsByChain(it, walletAddress, cardAddress)
+                    it.chainName to allErc20DetailsByChain
                 } catch (e: Exception) {
-                    it1.chainName to emptyMap()
+                    it.chainName to emptyMap()
                 }
             }
 
@@ -103,14 +88,14 @@ class QrController(
                 = qrControllerValidation.validateQrPayment(request)
 
 
-// TODO: Diskusi chain Id or Name
+        // TODO: Diskusi chain Id or Name
         val findAllERC20Token = chainService.getAllERC20Token(chain)
 
 
-// TODO: Implement Payment QR
-// 1. Checking allowance
-// 2. Sponsor / Recovery Card Gass
-// 3. TransferFrom
+        // TODO: Implement Payment QR
+        // 1. Checking allowance
+        // 2. Sponsor / Recovery Card Gass
+        // 3. TransferFrom
 
         return ResponseEntity.ok().body(null);
 
