@@ -2,7 +2,7 @@ package id.co.awan.walle.service
 
 import id.co.awan.walle.config.RestTemplateTestConfig
 import id.co.awan.walle.config.RestConfig
-import id.co.awan.walle.service.coingecko.CoinGeckoService
+import id.co.awan.walle.service.thirdparty.CoinGeckoService
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -38,5 +38,7 @@ class CoinGeckoServiceTest {
         val coinPrice = service.coinPrice("ethereum", "IDR", "0xdac17f958d2ee523a2206206994597c13d831ec7", 16)
         assert(coinPrice > BigDecimal.TWO)
     }
+
+
 
 }
