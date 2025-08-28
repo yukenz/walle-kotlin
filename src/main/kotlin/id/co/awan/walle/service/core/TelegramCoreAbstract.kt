@@ -50,7 +50,7 @@ abstract class TelegramCoreAbstract(
         body: JsonNode? = null,
     ): ResponseEntity<JsonNode?> {
 
-        val url = UriComponentsBuilder.fromUriString("$telegramHost/$apiKey/$telegramMethodName")
+        val url = UriComponentsBuilder.fromUriString("$telegramHost/bot$apiKey/$telegramMethodName")
             .queryParams(queryParams)
             .build()
             .toUri()
