@@ -55,6 +55,15 @@ class HSMService(
             HttpStatus.NOT_FOUND, "HSM Not Found"
         )
 
+    fun getHsm(
+        hashCard: String,
+    ): Hsm = hsmRepository.findById(hashCard)
+        .orElseThrow {
+            ResponseStatusException(
+                HttpStatus.NOT_FOUND, "HSM Not Found"
+            )
+        }
+
     @Transactional
     fun resetHsm(
         hashCardUUID: String
@@ -69,6 +78,7 @@ class HSMService(
 
         hsmRepository.save(hsm)
     }
+
 
     @Transactional
     fun createCard(
@@ -101,7 +111,7 @@ class HSMService(
         hsmRepository.save(hsm)
     }
 
-    fun getCards(ownerAddress: String): MutableList<String> {
+    fun getCard(ownerAddress: String): MutableList<String> {
         val userProfile = walletProfileRepository.findById(ownerAddress.lowercase())
         return userProfile.get().hsm
             .map { it.hashCard }   // Kotlin way - maps and filters nulls

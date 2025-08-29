@@ -24,7 +24,7 @@ class TestingCardController(
     )
     fun resetRegisteredCardForTest(
         @RequestBody hashCardUUID: String
-    ): ResponseEntity<Any?> {
+    ): ResponseEntity<String> {
         hsmService.resetHsm(hashCardUUID)
         return ResponseEntity.ok(hashCardUUID)
     }
