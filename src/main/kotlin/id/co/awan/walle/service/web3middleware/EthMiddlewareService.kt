@@ -159,7 +159,7 @@ class EthMiddlewareService(
 
         if (cardBalance < gasFee) {
 
-            val amountForRecover = gasFee.subtract(cardBalance)
+            val amountForRecover = gasFee - cardBalance
 
             // TODO: Handle this later
             gasFeeEIP1559(chain, cardAddress, amountForRecover, "WEI")

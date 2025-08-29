@@ -21,9 +21,8 @@ class QrController(
     )
     fun qrInquiry(
         @RequestParam(name = "merchantId") merchantId: String,
-        @RequestParam(name = "cardAddress") cardAddress: String,
     ): ResponseEntity<JsonNode> =
-        ResponseEntity.ok(business.qrInquiry(merchantId, cardAddress))
+        ResponseEntity.ok(business.qrInquiry(merchantId))
 
     @Operation(summary = "Query QR Merchant")
     @GetMapping(
@@ -34,7 +33,7 @@ class QrController(
         @RequestParam(name = "cardAddress") cardAddress: String,
         @RequestParam(name = "hashCard") hashCard: String,
     ): ResponseEntity<*> =
-        ResponseEntity.ok(business.qrInquiry(cardAddress, hashCard))
+        ResponseEntity.ok(business.qrMetadataInquiry(cardAddress, hashCard))
 
 
     @Operation(summary = "Payment QR Merchant")
@@ -43,10 +42,11 @@ class QrController(
         consumes = [MediaType.APPLICATION_JSON_VALUE],
         produces = [MediaType.TEXT_PLAIN_VALUE]
     )
-    fun qrPayment(
+    suspend fun qrPayment(
         @RequestBody request: JsonNode
-    ): ResponseEntity<Unit> =
-        ResponseEntity.ok(business.qrPayment(request))
+    ): ResponseEntity<Unit> {
+        return ResponseEntity.ok(business.qrPayment(request))
+    }
 
 
 }

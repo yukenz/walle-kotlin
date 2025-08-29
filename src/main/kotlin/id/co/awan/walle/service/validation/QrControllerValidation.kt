@@ -51,6 +51,10 @@ class QrControllerValidation(
         @field:NotNull
         @field:NotBlank
         val ethSignMessage: String,
+
+        @field:NotNull
+        @field:NotBlank
+        val message: String,
     )
 
     fun validateQrPayment(request: JsonNode): QrPaymentRequestPayload {
