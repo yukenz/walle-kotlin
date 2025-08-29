@@ -58,7 +58,7 @@ class QrController(
         @RequestParam(name = "hashCard") hashCard: String,
     ): ResponseEntity<*> {
 
-        val walletAddress = hsmService.getOwnerById(hashCard)
+        val walletAddress = hsmService.getWalletOwnerByHashCard(hashCard)
         val response = chainService.getAllRegisteredChain()
             .associate {
                 try {

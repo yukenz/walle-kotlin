@@ -54,9 +54,9 @@ class TelegramService(
 
     fun getChatIdByUsername(username: String): Int? {
         getUpdates().body?.run {
-            // Find JsonNode
-            at("/result")
+            at("/result") // Array Node
                 .toMutableList().forEach {
+                    // Loop for find username
                     val usernamePtr = it.at("/message/from/username")
                     if (usernamePtr.asText() contentEquals username) {
                         return it.at("/message/from/id").asInt()

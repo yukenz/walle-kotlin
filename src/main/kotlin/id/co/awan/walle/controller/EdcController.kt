@@ -2,12 +2,12 @@ package id.co.awan.walle.controller
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.JsonNodeFactory
-import id.co.awan.walle.service.web3middleware.ERC20MiddlewareService
-import id.co.awan.walle.service.web3middleware.EthMiddlewareService
 import id.co.awan.walle.service.dao.HSMService
 import id.co.awan.walle.service.dao.MerchantService
 import id.co.awan.walle.service.dao.TerminalService
 import id.co.awan.walle.service.validation.EdcControllerValidation
+import id.co.awan.walle.service.web3middleware.ERC20MiddlewareService
+import id.co.awan.walle.service.web3middleware.EthMiddlewareService
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -18,9 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 import java.security.SignatureException
-import kotlin.Throws
-import kotlin.apply
-import kotlin.arrayOf
 
 @RestController
 @RequestMapping("/api/v1/edc")
@@ -90,7 +87,6 @@ class EdcController(
             merchantKey
         )
 
-        erc20MiddlewareService
 
         // Find HSM
         val hsm = hsmService.getHsm(hashCard, hashPin)
@@ -98,7 +94,7 @@ class EdcController(
         // Construct Json Response
         val response = JsonNodeFactory.instance.objectNode().apply {
             put(
-                "fromAddress", hsm.ownerAddress ?: throw ResponseStatusException(
+                "fromAddress", hsm.walletProfile?.walletAddress ?: throw ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR, "01|hsm.ownerAddress should not be null"
                 )
             )

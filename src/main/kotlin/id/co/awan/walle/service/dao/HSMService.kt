@@ -1,18 +1,20 @@
 package id.co.awan.walle.service.dao
 
 import id.co.awan.walle.entity.Hsm
+import id.co.awan.walle.entity.WalletProfile
 import id.co.awan.walle.repository.HsmRepository
+import id.co.awan.walle.repository.UserProfileRepository
 import org.apache.hc.client5.http.utils.Hex
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 import java.security.SecureRandom
-import java.util.*
 
 @Service
 class HSMService(
-    private val hsmRepository: HsmRepository
+    private val hsmRepository: HsmRepository,
+    private val userProfileRepository: UserProfileRepository
 ) {
 
     @Transactional
@@ -32,19 +34,23 @@ class HSMService(
         hashCard: String,
         hashPin: String,
         ownerAddress: String
-    ): Hsm = hsmRepository.findByIdAndPinAndOwnerAddress(
-        id = hashCard,
-        pin = hashPin,
-        ownerAddress.lowercase()
-    ) ?: throw ResponseStatusException(
-        HttpStatus.NOT_FOUND, "HSM Not Found"
-    )
+    ): Hsm {
 
+        return hsmRepository.findByHashCardAndPinAndWalletProfile(
+            id = hashCard,
+            pin = hashPin,
+            walletProfile = WalletProfile().apply {
+                walletAddress = ownerAddress
+            }
+        ) ?: throw ResponseStatusException(
+            HttpStatus.NOT_FOUND, "HSM Not Found"
+        )
+    }
 
     fun getHsm(
         hashCard: String,
         hashPin: String
-    ): Hsm = hsmRepository.findByIdAndPin(hashCard, hashPin)
+    ): Hsm = hsmRepository.findByHashCardAndPin(hashCard, hashPin)
         ?: throw ResponseStatusException(
             HttpStatus.NOT_FOUND, "HSM Not Found"
         )
@@ -58,8 +64,8 @@ class HSMService(
             .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "01|HSM not found") }!!
 
         hsm.pin = null
-        hsm.ownerAddress = null
         hsm.secretKey = null
+        hsm.walletProfile = null
 
         hsmRepository.save(hsm)
     }
@@ -71,34 +77,39 @@ class HSMService(
         ownerAddress: String
     ) {
 
-        val hsmResult: Optional<Hsm> = hsmRepository.findById(hashCard)
-        // Cord not issued
-        if (hsmResult.isEmpty) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Card UUID not valid")
-        }
-
-        val hsm: Hsm = hsmResult.get()
+        val hsm = hsmRepository.findById(hashCard)
+            .orElseThrow { ResponseStatusException(HttpStatus.BAD_REQUEST, "Card UUID not valid") }
 
         // Cord already registered with some address
-        if (hsm.ownerAddress != null) {
+        if (hsm.walletProfile != null) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Card already registered")
         }
 
-        hsm.ownerAddress = ownerAddress.lowercase(Locale.getDefault())
+        val walletProfile = WalletProfile().apply {
+            walletAddress = ownerAddress
+            username = "username"
+            email = "email"
+        }
+
         hsm.pin = hashPin
         hsm.secretKey = Hex.encodeHexString(SecureRandom.getInstanceStrong().generateSeed(32))
+        hsm.walletProfile = walletProfile
 
         hsmRepository.save(hsm)
     }
 
     fun getCards(ownerAddress: String): MutableList<String> {
-        return hsmRepository.findAllByOwnerAddress(ownerAddress.lowercase())
-            .mapNotNull { it.id }   // Kotlin way - maps and filters nulls
+        val userProfile = userProfileRepository.findById(ownerAddress.lowercase())
+        return userProfile.get().hsm
+            .map { it.hashCard }   // Kotlin way - maps and filters nulls
             .toMutableList()        // Convert to MutableList)
     }
 
-    fun getOwnerById(hashCard: String) = hsmRepository.findOwnerByHashCard(hashCard.lowercase())
-        ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "HSM Not Found")
-
-
+    fun getWalletOwnerByHashCard(hashCard: String): String {
+        return hsmRepository.findById(hashCard.lowercase())
+            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "HSM Not Found") }
+            .walletProfile?.walletAddress
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Owner Not Found")
+    }
 }
+
