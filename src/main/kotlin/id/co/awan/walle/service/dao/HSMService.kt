@@ -3,7 +3,7 @@ package id.co.awan.walle.service.dao
 import id.co.awan.walle.entity.Hsm
 import id.co.awan.walle.entity.WalletProfile
 import id.co.awan.walle.repository.HsmRepository
-import id.co.awan.walle.repository.UserProfileRepository
+import id.co.awan.walle.repository.WalletProfileRepository
 import org.apache.hc.client5.http.utils.Hex
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -14,7 +14,7 @@ import java.security.SecureRandom
 @Service
 class HSMService(
     private val hsmRepository: HsmRepository,
-    private val userProfileRepository: UserProfileRepository
+    private val walletProfileRepository: WalletProfileRepository
 ) {
 
     @Transactional
@@ -81,15 +81,18 @@ class HSMService(
             .orElseThrow { ResponseStatusException(HttpStatus.BAD_REQUEST, "Card UUID not valid") }
 
         // Cord already registered with some address
-        if (hsm.walletProfile != null) {
+        if (hsm.walletProfile?.walletAddress != null) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Card already registered")
         }
 
-        val walletProfile = WalletProfile().apply {
-            walletAddress = ownerAddress
-            username = "username"
-            email = "email"
-        }
+        val walletProfile = walletProfileRepository.findById(ownerAddress.lowercase())
+            .orElse(WalletProfile().apply {
+                walletAddress = ownerAddress.lowercase()
+                username = "changethisusername"
+                email = "changethisemail"
+            })
+
+        walletProfileRepository.save(walletProfile)
 
         hsm.pin = hashPin
         hsm.secretKey = Hex.encodeHexString(SecureRandom.getInstanceStrong().generateSeed(32))
@@ -99,7 +102,7 @@ class HSMService(
     }
 
     fun getCards(ownerAddress: String): MutableList<String> {
-        val userProfile = userProfileRepository.findById(ownerAddress.lowercase())
+        val userProfile = walletProfileRepository.findById(ownerAddress.lowercase())
         return userProfile.get().hsm
             .map { it.hashCard }   // Kotlin way - maps and filters nulls
             .toMutableList()        // Convert to MutableList)

@@ -7,7 +7,9 @@ import jakarta.persistence.*
 class WalletProfile {
 
     @Id
-    @Column(name = "wallet_address", nullable = true)
+//    @Generated(event = [EventType.INSERT])
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "wallet_address", nullable = false)
     lateinit var walletAddress: String
 
     @Column(name = "username", nullable = true, unique = true)
