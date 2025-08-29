@@ -65,7 +65,7 @@ class EdcBusiness(
 
 
         // Find HSM
-        val hsm = hsmService.getHsm(hashCard, hashPin)
+        val hsm = hsmService.validateHsm(hashCard, hashPin)
 
         // Construct Json Response
         val response = JsonNodeFactory.instance.objectNode().apply {
@@ -117,7 +117,7 @@ class EdcBusiness(
         )
 
         // Validate Card is Valid Walle
-        hsmService.getHsm(hashCard, hashPin, ownerAddress)
+        hsmService.validateHsm(hashCard, hashPin, ownerAddress)
 
         // Try to recover card gas availability
         ethMiddlewareService.recoverCardGasAvailability(chain, cardAddress)

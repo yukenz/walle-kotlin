@@ -18,10 +18,9 @@ class CardBusiness(
     private val ethMiddlewareService: EthMiddlewareService
 ) {
 
-    fun registerCard(ethSignMessage: String): MutableList<String> {
+    fun getCards(ethSignMessage: String): MutableList<String> {
         // Validate Signature
         val addressRecovered = ethMiddlewareService.ecRecover("CARD_QUERY", ethSignMessage)
-
         // Query Cards
         val cards = hsmService.getCard(addressRecovered)
 
@@ -29,10 +28,8 @@ class CardBusiness(
     }
 
     fun registerCard(request: JsonNode): Unit {
-
         // Destruct Request
         val (chain, hashCard, hashPin, ethSignMessage, signerAddress) = validator.validateRegisterCard(request)
-
         // Validate Signature
         val recoveredAddress = eip712MiddlewareService.validateSignerCardSelfService(
             chain,
@@ -43,9 +40,9 @@ class CardBusiness(
             signerAddress
         )
 
-        val hsm = hsmService.getHsm(recoveredAddress)
+        val hsm = hsmService.validateHsm(hashCard)
 
-        // Cord already registered with some address
+        // Card already registered with some address
         if (hsm.walletProfile?.walletAddress != null) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Card already registered")
         }
@@ -55,7 +52,6 @@ class CardBusiness(
             hashCard, hashPin,
             ownerAddress = recoveredAddress
         )
-
     }
 
     fun accessCard(request: JsonNode): String? {
@@ -74,7 +70,7 @@ class CardBusiness(
         )
 
         // Find HSM
-        val hsm = hsmService.getHsm(
+        val hsm = hsmService.validateHsm(
             hashCard,
             hashPin,
             recoveredAddress
@@ -106,6 +102,4 @@ class CardBusiness(
         )
 
     }
-
-
 }

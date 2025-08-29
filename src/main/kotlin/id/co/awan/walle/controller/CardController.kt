@@ -24,13 +24,12 @@ class CardController(
         produces = [MediaType.APPLICATION_JSON_VALUE]
     )
     fun getCards(@RequestBody ethSignMessage: String): ResponseEntity<MutableList<String>> =
-        ResponseEntity.ok(business.registerCard(ethSignMessage))
+        ResponseEntity.ok(business.getCards(ethSignMessage))
 
     @Operation(summary = "RegisterCard")
     @PostMapping(
         path = ["/register"],
         consumes = [MediaType.APPLICATION_JSON_VALUE],
-        produces = [MediaType.TEXT_PLAIN_VALUE]
     )
     fun registerCard(@RequestBody request: JsonNode): ResponseEntity<Unit> =
         ResponseEntity.ok(business.registerCard(request))
@@ -48,7 +47,6 @@ class CardController(
     @PostMapping(
         path = ["/change-pin"],
         consumes = [MediaType.APPLICATION_JSON_VALUE],
-        produces = [MediaType.TEXT_PLAIN_VALUE]
     )
     fun changePin(@RequestBody request: JsonNode): ResponseEntity<Unit> =
         ResponseEntity.ok(business.changePin(request))

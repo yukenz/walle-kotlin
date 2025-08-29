@@ -24,13 +24,16 @@ class HSMService(
         newHashPin: String,
         ownerAddress: String
     ) {
-        val hsm: Hsm = getHsm(hashCard, hashPin, ownerAddress)
+        val hsm: Hsm = validateHsm(hashCard, hashPin, ownerAddress)
         hsm.pin = newHashPin
         hsmRepository.save(hsm)
     }
 
 
-    fun getHsm(
+    /**
+     * For validating card
+     */
+    fun validateHsm(
         hashCard: String,
         hashPin: String,
         ownerAddress: String
@@ -40,14 +43,17 @@ class HSMService(
             id = hashCard,
             pin = hashPin,
             walletProfile = WalletProfile().apply {
-                walletAddress = ownerAddress
+                walletAddress = ownerAddress.lowercase()
             }
         ) ?: throw ResponseStatusException(
             HttpStatus.NOT_FOUND, "HSM Not Found"
         )
     }
 
-    fun getHsm(
+    /**
+     * For accessing card
+     */
+    fun validateHsm(
         hashCard: String,
         hashPin: String
     ): Hsm = hsmRepository.findByHashCardAndPin(hashCard, hashPin)
@@ -55,7 +61,10 @@ class HSMService(
             HttpStatus.NOT_FOUND, "HSM Not Found"
         )
 
-    fun getHsm(
+    /**
+     * For registering card
+     */
+    fun validateHsm(
         hashCard: String,
     ): Hsm = hsmRepository.findById(hashCard)
         .orElseThrow {
