@@ -28,7 +28,6 @@ class QrControllerValidation(
         val cardAddress: String,
 
         @field:NotNull
-        @field:NotBlank
         val amount: BigInteger,
 
         @field:NotNull
@@ -52,10 +51,7 @@ class QrControllerValidation(
         @field:NotBlank
         val ethSignMessage: String,
 
-        @field:NotNull
-        @field:NotBlank
-        val message: String,
-    )
+        )
 
     fun validateQrPayment(request: JsonNode): QrPaymentRequestPayload {
         val requestPojo = objectMapper.treeToValue(request, QrPaymentRequestPayload::class.java)

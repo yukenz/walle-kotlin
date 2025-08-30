@@ -40,11 +40,11 @@ class QrController(
     @PostMapping(
         path = ["/payment"],
         consumes = [MediaType.APPLICATION_JSON_VALUE],
-        produces = [MediaType.TEXT_PLAIN_VALUE]
+        produces = [MediaType.APPLICATION_JSON_VALUE]
     )
-    suspend fun qrPayment(
+     fun qrPayment(
         @RequestBody request: JsonNode
-    ): ResponseEntity<Unit> {
+    ): ResponseEntity<List<String>> {
         return ResponseEntity.ok(business.qrPayment(request))
     }
 

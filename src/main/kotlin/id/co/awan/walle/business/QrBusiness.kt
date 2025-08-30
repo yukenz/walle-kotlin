@@ -10,14 +10,13 @@ import id.co.awan.walle.service.dao.MerchantService
 import id.co.awan.walle.service.validation.QrControllerValidation
 import id.co.awan.walle.service.web3middleware.ERC20MiddlewareService
 import id.co.awan.walle.service.web3middleware.EthMiddlewareService
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import org.slf4j.LoggerFactory
-import org.springframework.boot.LazyInitializationExcludeFilter
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import java.math.BigInteger
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Executors
 
 @Service
 class QrBusiness(
@@ -27,7 +26,6 @@ class QrBusiness(
     private val chainService: ChainService,
     private val erc20MetadataService: Erc20MetadataService,
     private val erc20MiddlewareService: ERC20MiddlewareService,
-    private val scheduledBeanLazyInitializationExcludeFilter: LazyInitializationExcludeFilter,
     private val ethMiddlewareService: EthMiddlewareService,
 ) {
 
@@ -40,7 +38,6 @@ class QrBusiness(
         val response = JsonNodeFactory.instance.objectNode().apply {
             put("id", merchant.id)
             put("name", merchant.name)
-            put("address", merchant.address)
         }
 
         return response
@@ -63,7 +60,7 @@ class QrBusiness(
         return response
     }
 
-    suspend fun qrPayment(request: JsonNode): Unit = coroutineScope {
+    fun qrPayment(request: JsonNode): List<String> {
 
         val (merchantId, cardAddress, amount, chain, erc20Address, hashCard, hashPin, ethSignMessage)
                 = qrControllerValidation.validateQrPayment(request)
@@ -74,20 +71,33 @@ class QrBusiness(
             cardAddress,
             ethSignMessage
         )
+
+        // Init threadpool
+        val executorService = Executors.newFixedThreadPool(3) { runnable ->
+            Thread(runnable, "qrpayment")
+        }
         // Find HSM
-        val deferredHsm = async { hsmService.validateHsm(hashCard, hashPin) }
+        val deferredHsm = CompletableFuture.supplyAsync({ hsmService.validateHsm(hashCard, hashPin) }, executorService)
         // Find Merchant
-        val deferredMerchant = async { merchantService.validateMerchant(merchantId) }
+        val deferredMerchant =
+            CompletableFuture.supplyAsync({ merchantService.validateMerchant(merchantId) }, executorService)
         // Find Gas Price
-        val deferredGasFee = async { ethMiddlewareService.gasPrice(chain).multiply(BigInteger.valueOf(70000L)) }
+        val deferredGasFee =
+            CompletableFuture.supplyAsync(
+                { ethMiddlewareService.gasPrice(chain).multiply(BigInteger.valueOf(70000L)) },
+                executorService
+            )
         // Get Card Balance
-        val deferredCardGasBalance = async { ethMiddlewareService.balanceOf(chain, cardAddress) }
+        val deferredCardGasBalance =
+            CompletableFuture.supplyAsync({ ethMiddlewareService.balanceOf(chain, cardAddress) }, executorService)
 
         // Await
-        val hsm = deferredHsm.await()
-        val merchant = deferredMerchant.await()
-        val gasFee = deferredGasFee.await()
-        val cardGasBalance = deferredCardGasBalance.await()
+        CompletableFuture.allOf(deferredHsm, deferredMerchant, deferredGasFee, deferredCardGasBalance).join()
+        val hsm = deferredHsm.get()
+        val merchant = deferredMerchant.get()
+        val gasFee = deferredGasFee.get()
+        val cardGasBalance = deferredCardGasBalance.get()
+        executorService.shutdown()
 
         // Validate Allowance
         erc20MiddlewareService.allowance(
@@ -119,6 +129,8 @@ class QrBusiness(
                 cardGasBalance
             )
         }
+
+        return listOf(merchant.address, hsm.secretKey!!)
 
     }
 }
