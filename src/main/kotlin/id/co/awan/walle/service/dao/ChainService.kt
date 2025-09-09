@@ -14,6 +14,9 @@ class ChainService(
         return chainRepository.findErc20ListByChainName(chainId);
     }
 
+    /**
+     * Mendapatkan Chain (berbentuk metadata) yang sudah teregister pada DB Platform Walle
+     */
     fun getAllRegisteredChain(): Set<Chain> = chainRepository.findAll().toSet()
 
 }
