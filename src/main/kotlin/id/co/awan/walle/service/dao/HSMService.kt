@@ -17,6 +17,12 @@ class HSMService(
     private val walletProfileRepository: WalletProfileRepository
 ) {
 
+    /**
+     * Mengganti PIN dari kartu
+     *
+     * @throws ResponseStatusException 404 Jika HSM tidak ditemukan
+     */
+    @Throws(ResponseStatusException::class)
     @Transactional
     fun changePin(
         hashCard: String,
@@ -31,8 +37,12 @@ class HSMService(
 
 
     /**
-     * For validating card
+     * Memvalidasi dan mencari HSM berdasarkan hash dari card,pin dan owner.
+     *
+     * Digunakan untuk mengakses card.
+     * @throws ResponseStatusException 404 Jika HSM tidak ditemukan
      */
+    @Throws(ResponseStatusException::class)
     fun validateHsm(
         hashCard: String,
         hashPin: String,
@@ -51,8 +61,12 @@ class HSMService(
     }
 
     /**
-     * For accessing card
+     * Memvalidasi dan mencari HSM berdasarkan hash dari card,pin.
+     *
+     * Digunakan untuk mengakses card.
+     * @throws ResponseStatusException 404 Jika HSM tidak ditemukan
      */
+    @Throws(ResponseStatusException::class)
     fun validateHsm(
         hashCard: String,
         hashPin: String
@@ -62,8 +76,12 @@ class HSMService(
         )
 
     /**
-     * For registering card
+     * Memvalidasi dan mencari HSM berdasarkan hash dari card.
+     *
+     * Digunakan untuk mendaftarkan card ke HSM.
+     * @throws ResponseStatusException 404 Jika Card belum didaftarkan ke HSM oleh Vendor
      */
+    @Throws(ResponseStatusException::class)
     fun validateHsm(
         hashCard: String,
     ): Hsm = hsmRepository.findById(hashCard)
@@ -73,6 +91,11 @@ class HSMService(
             )
         }
 
+    /**
+     * Mereset HSM dari Card
+     * @throws ResponseStatusException 404 Jika HSM dari Card tidak ditemukan
+     */
+    @Throws(ResponseStatusException::class)
     @Transactional
     fun resetHsm(
         hashCardUUID: String
@@ -88,7 +111,14 @@ class HSMService(
         hsmRepository.save(hsm)
     }
 
-
+    /**
+     * Mendaftarkan HSM untuk card.
+     *
+     * Pemilik harus memberikan wallet address dan PIN untuk didaftarkan
+     * @throws ResponseStatusException 400 Jika Card belum didaftarkan ke HSM oleh Vendor
+     * @throws ResponseStatusException 400 Jika Card sudah didaftarkan
+     */
+    @Throws(ResponseStatusException::class)
     @Transactional
     fun createCard(
         hashCard: String,
@@ -104,6 +134,7 @@ class HSMService(
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Card already registered")
         }
 
+        // TODO: Selesaikan Setup ini
         val walletProfile = walletProfileRepository.findById(ownerAddress.lowercase())
             .orElse(WalletProfile().apply {
                 walletAddress = ownerAddress.lowercase()
@@ -112,7 +143,6 @@ class HSMService(
             })
 
         walletProfileRepository.save(walletProfile)
-
         hsm.pin = hashPin
         hsm.secretKey = Hex.encodeHexString(SecureRandom.getInstanceStrong().generateSeed(32))
         hsm.walletProfile = walletProfile
@@ -120,6 +150,10 @@ class HSMService(
         hsmRepository.save(hsm)
     }
 
+
+    /**
+     * Mencari kartu-kartu (Hash Card) di HSM yang dimiliki oleh satu Address
+     */
     fun getCard(ownerAddress: String): MutableList<String> {
         val userProfile = walletProfileRepository.findById(ownerAddress.lowercase())
         return userProfile.get().hsm
@@ -127,6 +161,12 @@ class HSMService(
             .toMutableList()        // Convert to MutableList)
     }
 
+    /**
+     * Mencari dari kartu berdasarkan kartu (Hash Card)
+     * @throws ResponseStatusException 404 Jika HSM tidak ada
+     * @throws ResponseStatusException 404 Jika belum memiliki owner
+     */
+    @Throws(ResponseStatusException::class)
     fun getWalletOwnerByHashCard(hashCard: String): String {
         return hsmRepository.findById(hashCard.lowercase())
             .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "HSM Not Found") }

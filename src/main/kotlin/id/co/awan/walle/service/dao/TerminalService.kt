@@ -14,6 +14,11 @@ class TerminalService(
 ) {
 
 
+    /**
+     * Memvalidasi dan mencari Terminal berdasarkan ID dan Key dari Terminal.
+     *
+     * @throws ResponseStatusException 401 Jika ID dan Key terminal tidak ditemukan di Database
+     */
     fun validateTerminal(
         terminalId: String,
         terminalKey: String

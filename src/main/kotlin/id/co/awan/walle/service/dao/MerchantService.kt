@@ -2,21 +2,22 @@ package id.co.awan.walle.service.dao
 
 import id.co.awan.walle.entity.Merchant
 import id.co.awan.walle.entity.Terminal
-import id.co.awan.walle.repository.HsmRepository
 import id.co.awan.walle.repository.MerchantRepository
-import id.co.awan.walle.repository.TerminalRepository
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 
 @Service
 class MerchantService(
-    private val hsmRepository: HsmRepository,
     private val merchantRepository: MerchantRepository,
-    private val terminalRepository: TerminalRepository
 ) {
 
 
+    /**
+     * Mendapatkan data Merchant berdasarkan merchantId
+     * @throws ResponseStatusException 401 Jika merchant tidak ditemukan
+     * */
+    @Throws(ResponseStatusException::class)
     fun validateMerchant(
         merchantId: String,
     ): Merchant {
@@ -28,6 +29,14 @@ class MerchantService(
         }
     }
 
+
+    /**
+     * Mendapatkan data Merchant berdasarkan data terminal merchantId dan merchantKey
+     * @throws ResponseStatusException 404 Jika merchant terminal belum link ke merchant
+     * @throws ResponseStatusException 401 Jika merchant tidak cocok dengan yang terdaftar di terminal
+     * @throws ResponseStatusException 401 Jika merchant key tidak valid
+     * */
+    @Throws(ResponseStatusException::class)
     fun validateMerchantWithTerminal(
         terminal: Terminal,
         merchantId: String,
