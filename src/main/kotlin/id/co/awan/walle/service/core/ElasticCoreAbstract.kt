@@ -15,13 +15,16 @@ abstract class ElasticCoreAbstract(
 
         data class HttpRequestLog(
             val method: String,
-            val url: String,
+            val baseUrl: String,
+            val path: String,
+            val query: String,
             val headers: Map<String, String>,
             val body: String
         )
 
         data class HttpResponseLog(
             val statusCode: Int,
+            val statusText: String,
             val headers: Map<String, String>,
             val body: String
         )
@@ -29,6 +32,7 @@ abstract class ElasticCoreAbstract(
         data class HttpLog(
             val request: HttpRequestLog,
             val response: HttpResponseLog,
+            val totalTime: Long,
         )
 
         private val logger = LoggerFactory.getLogger(this::class.java)
@@ -50,6 +54,7 @@ abstract class ElasticCoreAbstract(
     fun submitLog(
         req: HttpRequestLog,
         res: HttpResponseLog,
+        totalTime: Long
     ) {
 
         val esClientAsync: ElasticsearchAsyncClient =
@@ -66,7 +71,7 @@ abstract class ElasticCoreAbstract(
         esClientAsync.index {
             it
                 .index("walle-13092025")
-                .document(HttpLog(req, res))
+                .document(HttpLog(req, res, totalTime))
         }.whenComplete { response, exception ->
             if (exception != null) {
                 logger.error("Failed to index", exception)

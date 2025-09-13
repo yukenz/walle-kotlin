@@ -65,6 +65,7 @@ class RestConfig {
     }
 
     fun interceptor1() = ClientHttpRequestInterceptor { req, body, exec ->
+        val nanoStart = System.nanoTime()
 
         val reqBody = if (body.isNotEmpty()) {
             String(body, Charsets.UTF_8)
@@ -73,8 +74,10 @@ class RestConfig {
         }
 
         val requestLog = ElasticCoreAbstract.Companion.HttpRequestLog(
+            baseUrl = req.uri.scheme + "://" + req.uri.host + (if (req.uri.port != -1) ":" + req.uri.port else ""),
             method = req.method.name(),
-            url = req.uri.toASCIIString(),
+            path = req.uri.path,
+            query = req.uri.query,
             headers = req.headers.toSingleValueMap(),
             body = reqBody
         )
@@ -88,11 +91,13 @@ class RestConfig {
         // Create HttpResponseLog
         val responseLog = ElasticCoreAbstract.Companion.HttpResponseLog(
             statusCode = originalResponse.statusCode.value(),
+            statusText = originalResponse.statusText,
             headers = originalResponse.headers.toSingleValueMap(),
             body = responseBodyString
         )
 
-        elasticCore().submitLog(requestLog, responseLog)
+        // Submit to Elastic
+        elasticCore().submitLog(requestLog, responseLog, System.nanoTime() - nanoStart)
 
         // Return the wrapped response
         object : ClientHttpResponse by originalResponse {
