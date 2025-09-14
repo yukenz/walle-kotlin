@@ -84,7 +84,7 @@ class RestConfig {
 
         val originalResponse = exec.execute(req, body)
 
-        // Read the response body (this consumes the original stream)
+        // Read the response body (this conpsumes the original stream)
         val responseBodyBytes = originalResponse.body.use { it.readBytes() }
         val responseBodyString = String(responseBodyBytes, Charsets.UTF_8)  // Assuming UTF-8
 

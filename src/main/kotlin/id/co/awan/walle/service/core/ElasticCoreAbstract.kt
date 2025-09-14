@@ -61,7 +61,8 @@ abstract class ElasticCoreAbstract(
             ElasticsearchAsyncClient.of { b: ElasticsearchTransportConfig.Builder ->
                 b
                     .host(elasticHost)
-                    .usernameAndPassword(elasticUser, elasticPassword)
+//                    .usernameAndPassword(elasticUser, elasticPassword)
+                    .apiKey(elasticApiKey)
                     .sslContext(
                         SSLContexts.custom()
                             .loadTrustMaterial(null) { _: Array<X509Certificate?>?, _: String? -> true }
