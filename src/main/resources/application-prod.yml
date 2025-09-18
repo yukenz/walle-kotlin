@@ -1,0 +1,71 @@
+spring:
+  application:
+    name: hackathon-blockdev
+  datasource:
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    type: com.zaxxer.hikari.HikariDataSource
+    url: ${DB_URL}
+    hikari:
+      pool-name: walle-db
+      maximum-pool-size: ${DB_MAX_POOL}
+      minimum-idle: ${DB_MIN_IDLE}
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      schema: walle
+      driver-class-name: org.postgresql.Driver
+      auto-commit: on
+  jpa:
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: false
+        defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+  sql:
+    init:
+      mode: never
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: alpha # For sorting endpoints alphabetically
+    tagsSorter: alpha # For sorting tags alphabetically
+  api-docs:
+    path: /api-docs
+  show-actuator: true
+
+midtrans:
+  host: ${MIDTRANS_BASE_URL}
+  path:
+    #    transaction: /snap/v1/transactions
+    transaction: /api/mock/midtrans/create-transactions
+  server-key: ${MIDTRANS_SERVER_KEY}
+  client-key: ${MIDTRANS_CLIENT_KEY}
+  merchant-id: ${MIDTRANS_MERCHANT_ID}
+
+telegram:
+  host: ${TELEGRAM_BASE_URL}
+  api-key: ${TELEGRAM_APIKEY}
+
+logging:
+  level:
+    io.undertow.request: off
+    com.zaxxer.hikari: info
+
+web3-mdw:
+  master-key-wallet: ${WEB3_MDW_MASTER_KEY_WALLET}
+  host: ${WEB3_MDW_BASE_URL}
+  username: ${WEB3_MDW_USERNAME}
+  password: ${WEB3_MDW_PASSWORD}
+
+coingecko:
+  host: ${COINGECKO_BASEURL}
+  api-key: ${COINGECKO_APIKEY}
+
+es:
+  host: ${ES_BASE_URL}
+  apikey: ${ES_API_KEY}
+
