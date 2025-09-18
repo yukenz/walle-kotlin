@@ -94,7 +94,7 @@ abstract class TelegramCoreAbstract(
     // DTO
 
     data class User(
-        val id: Integer,
+        val id: Int,
 
         @field:JsonProperty("is_bot")
         val isBot: Boolean,
@@ -162,20 +162,20 @@ abstract class TelegramCoreAbstract(
 
     data class SuggestedPostPrice(
         val currency: String,
-        val amount: Integer
+        val amount: Int
     )
 
     data class SuggestedPostParameters(
         val price: SuggestedPostPrice?,
-        val send_date: Integer?,
+        val send_date: Int?,
     )
 
     data class ReplyParameters(
         @field:JsonProperty("message_id")
-        val messageId: Integer,
+        val messageId: Int,
 
         @field:JsonProperty("chat_id")
-        val chatId: Integer,
+        val chatId: Int,
 
         @field:JsonProperty("allow_sending_without_reply")
         val allowSendingWithoutReply: Boolean,
@@ -189,10 +189,10 @@ abstract class TelegramCoreAbstract(
         val quoteEntities: List<MessageEntity>,
 
         @field:JsonProperty("quote_position")
-        val quotePosition: Integer,
+        val quotePosition: Int,
 
         @field:JsonProperty("checklist_task_id")
-        val checklistTaskId: Integer,
+        val checklistTaskId: Int,
 
         )
 
