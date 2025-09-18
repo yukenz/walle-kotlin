@@ -67,5 +67,7 @@ coingecko:
 
 es:
   host: ${ES_BASE_URL}
+  username: ${ES_USERNAME}
+  password: ${ES_PASSWORD}
   apikey: ${ES_API_KEY}
 
