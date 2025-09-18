@@ -6,6 +6,9 @@ import org.apache.hc.core5.ssl.SSLContexts
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import java.security.cert.X509Certificate
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 
 abstract class ElasticCoreAbstract(
@@ -17,22 +20,23 @@ abstract class ElasticCoreAbstract(
             val method: String,
             val baseUrl: String,
             val path: String,
-            val query: String,
+            val query: String?,
             val headers: Map<String, String>,
-            val body: String
+            val body: String?
         )
 
         data class HttpResponseLog(
             val statusCode: Int,
             val statusText: String,
             val headers: Map<String, String>,
-            val body: String
+            val body: String?
         )
 
         data class HttpLog(
             val request: HttpRequestLog,
             val response: HttpResponseLog,
             val totalTime: Long,
+            val createdAt: String,
         )
 
         private val logger = LoggerFactory.getLogger(this::class.java)
@@ -50,6 +54,21 @@ abstract class ElasticCoreAbstract(
 
     @Value("\${es.apikey}")
     private lateinit var elasticApiKey: String
+
+    private fun getIndexSuffixDate(): String {
+        val dtf = DateTimeFormatter.ofPattern("ddMMyyyy")
+        val now = Instant.now()
+        val nowAtZone = now.atZone(ZoneId.systemDefault())
+        return nowAtZone.format(dtf)
+    }
+
+    private fun getCreatedAt(): String {
+        val dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss Z")
+        val now = Instant.now()
+        val nowAtZone = now.atZone(ZoneId.systemDefault())
+        return nowAtZone.format(dtf)
+    }
+
 
     fun submitLog(
         req: HttpRequestLog,
@@ -71,8 +90,8 @@ abstract class ElasticCoreAbstract(
 
         esClientAsync.index {
             it
-                .index("walle-13092025")
-                .document(HttpLog(req, res, totalTime))
+                .index("walle-${getIndexSuffixDate()}")
+                .document(HttpLog(req, res, totalTime, getCreatedAt()))
         }.whenComplete { response, exception ->
             if (exception != null) {
                 logger.error("Failed to index", exception)

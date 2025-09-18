@@ -67,11 +67,7 @@ class RestConfig {
     fun interceptor1() = ClientHttpRequestInterceptor { req, body, exec ->
         val nanoStart = System.nanoTime()
 
-        val reqBody = if (body.isNotEmpty()) {
-            String(body, Charsets.UTF_8)
-        } else {
-            ""
-        }
+        val reqBody = String(body, Charsets.UTF_8)
 
         val requestLog = ElasticCoreAbstract.Companion.HttpRequestLog(
             baseUrl = req.uri.scheme + "://" + req.uri.host + (if (req.uri.port != -1) ":" + req.uri.port else ""),
