@@ -3,7 +3,7 @@ package id.co.awan.walle.entity
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "hsm", schema = "tap2pay")
+@Table(name = "hsm", schema = "walle")
 class Hsm {
 
     @Id

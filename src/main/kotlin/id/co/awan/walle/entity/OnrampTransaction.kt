@@ -10,7 +10,7 @@ import java.math.BigInteger
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "onramp", schema = "tap2pay")
+@Table(name = "onramp", schema = "walle")
 class OnrampTransaction {
 
     /* =================================================================================================================

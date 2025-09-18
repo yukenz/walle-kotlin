@@ -6,7 +6,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "user_wallet", schema = "tap2pay")
+@Table(name = "user_wallet", schema = "walle")
 class UserWallet {
 
     @Id
